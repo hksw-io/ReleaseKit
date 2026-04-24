@@ -1,3 +1,4 @@
+#if os(iOS) || os(macOS)
 import SwiftUI
 
 public struct WhatsNewView<Content: WhatsNewContent>: View {
@@ -204,3 +205,4 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
     }
     return WhatsNewView(content: PreviewContent(), onDismiss: {})
 }
+#endif

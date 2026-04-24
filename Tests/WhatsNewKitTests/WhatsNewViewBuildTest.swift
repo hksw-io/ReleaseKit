@@ -1,3 +1,4 @@
+#if os(iOS) || os(macOS)
 import SwiftUI
 import Testing
 @testable import WhatsNewKit
@@ -37,3 +38,4 @@ struct WhatsNewViewBuildTest {
         _ = WhatsNewView(content: RichContent(), onDismiss: {})
     }
 }
+#endif
