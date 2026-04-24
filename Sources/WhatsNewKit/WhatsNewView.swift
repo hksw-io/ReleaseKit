@@ -232,30 +232,65 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
     }
 }
 
-#Preview("What's New") {
-    struct PreviewContent: WhatsNewContent {
-        var title: Text { Text("What's New") }
-        var features: [WhatsNewFeature] {
-            [
-                WhatsNewFeature(
-                    image: Image(systemName: "sparkles"),
-                    label: Text("First feature"),
-                    description: Text("A short description of the first feature.")),
-                WhatsNewFeature(
-                    image: Image(systemName: "bolt"),
-                    label: Text("Second feature"),
-                    description: Text("A short description of the second feature.")),
-                WhatsNewFeature(
-                    image: Image(systemName: "arrow.triangle.2.circlepath"),
-                    label: Text("Third feature"),
-                    description: Text("A short description of the third feature.")),
-            ]
-        }
-        var notice: WhatsNewNotice? {
-            WhatsNewNotice(text: Text("Plus many other improvements."))
-        }
-        var buttonText: Text { Text("Continue") }
+private struct WhatsNewPreviewContent: WhatsNewContent {
+    var appIcon: Image? { Image(systemName: "app.gift.fill") }
+    var title: Text { Text("What's New") }
+    var features: [WhatsNewFeature] {
+        [
+            WhatsNewFeature(
+                systemImage: "sparkles",
+                label: "First feature",
+                description: "A short description of the first feature."),
+            WhatsNewFeature(
+                systemImage: "bolt",
+                label: "Second feature",
+                description: "A short description of the second feature."),
+            WhatsNewFeature(
+                systemImage: "arrow.triangle.2.circlepath",
+                label: "Third feature",
+                description: "A short description of the third feature."),
+        ]
     }
-    return WhatsNewView(content: PreviewContent(), onDismiss: {})
+    var notice: WhatsNewNotice? {
+        WhatsNewNotice(text: Text("Plus many other improvements."))
+    }
+    var buttonText: Text { Text("Continue") }
+}
+
+private struct LongWhatsNewPreviewContent: WhatsNewContent {
+    var appIcon: Image? { Image(systemName: "square.stack.3d.up.fill") }
+    var title: Text {
+        Text("A much longer What's New title that needs to wrap cleanly")
+    }
+    var features: [WhatsNewFeature] {
+        (1...10).map { index in
+            WhatsNewFeature(
+                systemImage: "checkmark.seal.fill",
+                label: "Feature \(index) with a longer localized label",
+                description: "This feature description is intentionally longer so the row wraps cleanly without clipping, overlapping, or hiding the footer action.")
+        }
+    }
+    var notice: WhatsNewNotice? {
+        WhatsNewNotice(text: Text("This notice is long enough to exercise multiline footer copy in a narrow sheet."))
+    }
+    var buttonText: Text {
+        Text("Continue with all of these new improvements")
+    }
+}
+
+#Preview("What's New") {
+    WhatsNewView(content: WhatsNewPreviewContent(), onDismiss: {})
+}
+
+#Preview("What's New Long Narrow") {
+    WhatsNewView(content: LongWhatsNewPreviewContent(), onDismiss: {})
+        .frame(width: 320, height: 720)
+}
+
+#Preview("What's New Dark Accessibility") {
+    WhatsNewView(content: LongWhatsNewPreviewContent(), onDismiss: {})
+        .frame(width: 390, height: 760)
+        .preferredColorScheme(.dark)
+        .dynamicTypeSize(.accessibility2)
 }
 #endif
