@@ -40,6 +40,25 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func viewConstructsWithConvenienceFeatureInitializer() {
+        struct ConvenienceContent: WhatsNewContent {
+            var title: Text { Text("Convenience") }
+            var features: [WhatsNewFeature] {
+                [
+                    WhatsNewFeature(
+                        systemImage: "sparkles",
+                        label: "Localized label",
+                        description: "Localized description."),
+                ]
+            }
+            var notice: WhatsNewNotice? { nil }
+            var buttonText: Text { Text("OK") }
+        }
+
+        _ = WhatsNewView(content: ConvenienceContent(), onDismiss: {})
+    }
+
+    @Test
     func viewConstructsWithLongLocalizedContentAndManyFeatures() {
         struct LongContent: WhatsNewContent {
             var appIcon: Image? { Image(systemName: "sparkles") }

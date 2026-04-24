@@ -31,9 +31,9 @@ struct MyWhatsNew: WhatsNewContent {
     var features: [WhatsNewFeature] {
         [
             WhatsNewFeature(
-                image: Image(systemName: "chart.line.uptrend.xyaxis.circle"),
-                label: Text("New Charts"),
-                description: Text("Track your progress with redesigned charts.")),
+                systemImage: "chart.line.uptrend.xyaxis.circle",
+                label: "New Charts",
+                description: "Track your progress with redesigned charts."),
         ]
     }
     var notice: WhatsNewNotice? {
