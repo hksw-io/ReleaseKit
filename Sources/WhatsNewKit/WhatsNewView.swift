@@ -83,7 +83,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
         }
         .interactiveDismissDisabled()
         #if os(macOS)
-            .frame(minWidth: 500, minHeight: 560)
+            .frame(minWidth: Tokens.Layout.compactSheetMinWidth, minHeight: 560)
         #endif
             .onAppear {
                 self.featuresVisible = true
