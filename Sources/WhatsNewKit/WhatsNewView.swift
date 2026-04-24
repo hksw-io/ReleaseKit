@@ -29,8 +29,15 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(spacing: self.contentSpacing) {
-                    self.headerSection
-                    self.featuresSection
+                    WhatsNewHeaderSection(
+                        content: self.content,
+                        iconSize: self.iconSize)
+                    WhatsNewFeatureList(
+                        features: self.content.features,
+                        featureSpacing: self.featureSpacing,
+                        featureIconSize: self.featureIconSize,
+                        featuresVisible: self.featuresVisible,
+                        reduceMotion: self.reduceMotion)
                 }
                 .frame(maxWidth: Tokens.Layout.contentMaxWidth)
                 .frame(maxWidth: .infinity)
@@ -49,7 +56,10 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 ZStack {
-                    self.footerSection
+                    WhatsNewFooterSection(
+                        content: self.content,
+                        buttonPadding: self.buttonPadding,
+                        onDismiss: self.onDismiss)
                         .frame(maxWidth: Tokens.Layout.contentMaxWidth)
                         .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
                 }
@@ -83,10 +93,15 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
     private func horizontalPadding(for width: CGFloat) -> CGFloat {
         width < Tokens.Layout.compactWidthBreakpoint ? self.compactHorizontalPadding : self.regularHorizontalPadding
     }
+}
 
-    private var headerSection: some View {
+private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
+    let content: Content
+    let iconSize: CGFloat
+
+    var body: some View {
         VStack(spacing: Tokens.Spacing.large) {
-            if let appIcon = content.appIcon {
+            if let appIcon = self.content.appIcon {
                 appIcon
                     .resizable()
                     .interpolation(.high)
@@ -109,21 +124,42 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                 .accessibilityAddTraits(.isHeader)
         }
     }
+}
 
-    private var featuresSection: some View {
+private struct WhatsNewFeatureList: View {
+    let features: [WhatsNewFeature]
+    let featureSpacing: CGFloat
+    let featureIconSize: CGFloat
+    let featuresVisible: Bool
+    let reduceMotion: Bool
+
+    var body: some View {
         VStack(spacing: self.featureSpacing) {
-            ForEach(Array(self.content.features.enumerated()), id: \.offset) { index, feature in
-                self.featureRow(feature: feature, index: index)
+            ForEach(Array(self.features.enumerated()), id: \.offset) { index, feature in
+                WhatsNewFeatureRow(
+                    feature: feature,
+                    index: index,
+                    featureIconSize: self.featureIconSize,
+                    featuresVisible: self.featuresVisible,
+                    reduceMotion: self.reduceMotion)
             }
         }
     }
+}
 
-    private func featureRow(feature: WhatsNewFeature, index: Int) -> some View {
+private struct WhatsNewFeatureRow: View {
+    let feature: WhatsNewFeature
+    let index: Int
+    let featureIconSize: CGFloat
+    let featuresVisible: Bool
+    let reduceMotion: Bool
+
+    var body: some View {
         let delay = Tokens.Motion.featureBaseDelay + (Double(index) * Tokens.Motion.featureStaggerDelay)
         let isVisible = self.featuresVisible
 
-        return HStack(alignment: .top, spacing: Tokens.Spacing.large) {
-            if let image = feature.image {
+        HStack(alignment: .top, spacing: Tokens.Spacing.large) {
+            if let image = self.feature.image {
                 image
                     .resizable()
                     .scaledToFit()
@@ -134,12 +170,12 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                if let label = feature.label {
+                if let label = self.feature.label {
                     label
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                feature.description
+                self.feature.description
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineSpacing(3)
@@ -157,10 +193,16 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             self.reduceMotion ? nil : .easeOut(duration: Tokens.Motion.revealDuration).delay(delay),
             value: isVisible)
     }
+}
 
-    private var footerSection: some View {
+private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
+    let content: Content
+    let buttonPadding: CGFloat
+    let onDismiss: () -> Void
+
+    var body: some View {
         VStack(spacing: Tokens.Spacing.medium) {
-            if let notice = content.notice {
+            if let notice = self.content.notice {
                 notice.text
                     .font(.caption)
                     .foregroundStyle(.secondary)
