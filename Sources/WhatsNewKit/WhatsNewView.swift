@@ -11,26 +11,30 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
 
     private let featureBaseDelay = 0.3
     private let featureStaggerDelay = 0.15
+    private let contentMaxWidth: CGFloat = 560
 
     #if os(macOS)
-        private let iconSize: CGFloat = 64
-        private let featureIconSize: CGFloat = 24
-        private let buttonPadding: CGFloat = 8
-        private let contentSpacing: CGFloat = 24
-        private let featureSpacing: CGFloat = 20
-        private let topPadding: CGFloat = 32
-        private let bottomPadding: CGFloat = 20
-        private let gradientMaskHeight: CGFloat = 60
+        @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 64
+        @ScaledMetric(relativeTo: .body) private var featureIconSize: CGFloat = 24
+        @ScaledMetric(relativeTo: .body) private var buttonPadding: CGFloat = 8
+        @ScaledMetric(relativeTo: .body) private var contentSpacing: CGFloat = 24
+        @ScaledMetric(relativeTo: .body) private var featureSpacing: CGFloat = 20
+        @ScaledMetric(relativeTo: .body) private var topPadding: CGFloat = 32
+        @ScaledMetric(relativeTo: .body) private var bottomPadding: CGFloat = 20
+        @ScaledMetric(relativeTo: .body) private var gradientMaskHeight: CGFloat = 60
     #else
-        private let iconSize: CGFloat = 100
-        private let featureIconSize: CGFloat = 35
-        private let buttonPadding: CGFloat = 14
-        private let contentSpacing: CGFloat = 38
-        private let featureSpacing: CGFloat = 32
-        private let topPadding: CGFloat = 32
-        private let bottomPadding: CGFloat = 24
-        private let gradientMaskHeight: CGFloat = 80
+        @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 100
+        @ScaledMetric(relativeTo: .body) private var featureIconSize: CGFloat = 35
+        @ScaledMetric(relativeTo: .body) private var buttonPadding: CGFloat = 14
+        @ScaledMetric(relativeTo: .body) private var contentSpacing: CGFloat = 38
+        @ScaledMetric(relativeTo: .body) private var featureSpacing: CGFloat = 32
+        @ScaledMetric(relativeTo: .body) private var topPadding: CGFloat = 32
+        @ScaledMetric(relativeTo: .body) private var bottomPadding: CGFloat = 24
+        @ScaledMetric(relativeTo: .body) private var gradientMaskHeight: CGFloat = 80
     #endif
+
+    @ScaledMetric(relativeTo: .body) private var compactHorizontalPadding: CGFloat = 16
+    @ScaledMetric(relativeTo: .body) private var regularHorizontalPadding: CGFloat = 24
 
     public init(content: Content, onDismiss: @escaping () -> Void) {
         self.content = content
@@ -44,10 +48,13 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                     self.headerSection
                     self.featuresSection
                 }
-                .padding(.horizontal, Tokens.Spacing.xLarge)
+                .frame(maxWidth: self.contentMaxWidth)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
                 .padding(.top, self.topPadding)
                 .padding(.bottom, self.bottomPadding)
             }
+            .scrollBounceBehavior(.basedOnSize)
             .onScrollGeometryChange(for: Double.self) { geometry in
                 guard geometry.contentSize.height > 0 else { return 1 }
                 let contentBottom = geometry.contentSize.height + geometry.contentInsets.bottom
@@ -56,22 +63,27 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             } action: { _, newOpacity in
                 self.fadeOpacity = newOpacity
             }
-            .safeAreaInset(edge: .bottom) {
-                self.footerSection
-                    .background(alignment: .top) {
-                        LinearGradient(
-                            colors: [
-                                Tokens.background.opacity(0),
-                                Tokens.background,
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom)
-                            .frame(height: self.gradientMaskHeight)
-                            .offset(y: -self.gradientMaskHeight)
-                            .opacity(self.fadeOpacity)
-                            .allowsHitTesting(false)
-                    }
-                    .background(Tokens.background)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                ZStack {
+                    self.footerSection
+                        .frame(maxWidth: self.contentMaxWidth)
+                        .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
+                }
+                .frame(maxWidth: .infinity)
+                .background(alignment: .top) {
+                    LinearGradient(
+                        colors: [
+                            Tokens.background.opacity(0),
+                            Tokens.background,
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom)
+                        .frame(height: self.gradientMaskHeight)
+                        .offset(y: -self.gradientMaskHeight)
+                        .opacity(self.fadeOpacity)
+                        .allowsHitTesting(false)
+                }
+                .background(Tokens.background)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
@@ -84,6 +96,10 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             }
     }
 
+    private func horizontalPadding(for width: CGFloat) -> CGFloat {
+        width < 390 ? self.compactHorizontalPadding : self.regularHorizontalPadding
+    }
+
     private var headerSection: some View {
         VStack(spacing: Tokens.Spacing.large) {
             if let appIcon = content.appIcon {
@@ -94,6 +110,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: self.iconSize, height: self.iconSize)
                     .clipShape(RoundedRectangle(cornerRadius: self.iconSize * 0.22))
+                    .accessibilityHidden(true)
             }
 
             self.content.title
@@ -104,12 +121,14 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             #endif
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
         }
     }
 
     private var featuresSection: some View {
         VStack(spacing: self.featureSpacing) {
-            ForEach(Array(self.content.features.enumerated()), id: \.element.id) { index, feature in
+            ForEach(Array(self.content.features.enumerated()), id: \.offset) { index, feature in
                 self.featureRow(feature: feature, index: index)
             }
         }
@@ -119,11 +138,12 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
         let delay = self.featureBaseDelay + (Double(index) * self.featureStaggerDelay)
         let isVisible = self.featuresVisible
 
-        return HStack(alignment: .center, spacing: Tokens.Spacing.large) {
+        return HStack(alignment: .top, spacing: Tokens.Spacing.large) {
             if let image = feature.image {
                 image
                     .resizable()
                     .scaledToFit()
+                    .symbolRenderingMode(.hierarchical)
                     .frame(width: self.featureIconSize, height: self.featureIconSize)
                     .foregroundStyle(.tint)
                     .accessibilityHidden(true)
@@ -133,12 +153,16 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                 if let label = feature.label {
                     label
                         .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 feature.description
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .multilineTextAlignment(.leading)
+            .layoutPriority(1)
 
             Spacer(minLength: 0)
         }
@@ -157,16 +181,20 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Button {
                 self.onDismiss()
             } label: {
                 self.content.buttonText
                     .font(.body.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, self.buttonPadding)
             }
             .buttonStyle(.borderedProminent)
+            .controlSize(.extraLarge)
             #if os(macOS)
                 .environment(\.controlActiveState, .key)
                 .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.large))
@@ -174,7 +202,6 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                 .glassEffect(in: .rect(cornerRadius: Tokens.Radius.large))
             #endif
         }
-        .padding(.horizontal, Tokens.Spacing.xLarge)
         .padding(.vertical, 20)
     }
 }
