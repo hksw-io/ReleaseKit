@@ -79,7 +79,7 @@ Built-in options:
 - `.system` — the default platform background.
 - `.softGradient` — a restrained blue/mint background tuned for readable content.
 - `.linearGradient(colors:startPoint:endPoint:)` — app-provided colors with the library-managed footer treatment.
-- `.animatedMesh(primary:secondary:accent:)` — an opt-in animated mesh gradient. It automatically becomes static when Reduce Motion is enabled.
+- `.animatedMesh(primary:secondary:accent:)` — an opt-in full-surface animated mesh gradient. It keeps a tinted base across the whole sheet and automatically becomes static when Reduce Motion is enabled.
 - `.custom { context in ... }` — a fully custom SwiftUI background. Use `context.reduceMotion` to keep custom animations accessible.
 
 Every background spans behind the pinned footer and button area, including `.system`.

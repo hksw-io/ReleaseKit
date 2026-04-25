@@ -254,6 +254,14 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func animatedMeshPointsChangeAcrossPhases() {
+        let first = WhatsNewAnimatedMeshGeometry.points(phase: 0, reduceMotion: false)
+        let second = WhatsNewAnimatedMeshGeometry.points(phase: 0.25, reduceMotion: false)
+
+        #expect(abs(first[4].x - second[4].x) > 0.0001)
+    }
+
+    @Test
     func featureInitializerStoresStableID() {
         let feature = WhatsNewFeature(
             id: "stable-feature",
