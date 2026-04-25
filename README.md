@@ -5,17 +5,23 @@ A reusable SwiftUI "What's New" sheet for iOS and macOS apps in the HK Softworks
 ## Requirements
 
 - iOS 26+ / macOS 26+
-- Swift 6.0+
+- Swift 6.2+
 
 ## Installation
 
-Add to your `Package.swift`:
+No release tags are published yet, so use the `master` branch for now:
+
+```swift
+.package(url: "https://github.com/hksw-io/WhatsNewKit.git", branch: "master")
+```
+
+Switch to a semantic version requirement after the first release tag exists:
 
 ```swift
 .package(url: "https://github.com/hksw-io/WhatsNewKit.git", from: "1.0.0")
 ```
 
-Or in Xcode: **File > Add Package Dependencies** and enter the URL above.
+Or in Xcode: **File > Add Package Dependencies**, enter the URL above, and select the `master` branch until a release tag is available.
 
 ## Usage
 
@@ -77,6 +83,21 @@ tracker.markAsShown()
 ```
 
 The first launch after install is treated as "not new" — users see the sheet only on subsequent version upgrades.
+
+## Local development
+
+Run the package tests from the package root:
+
+```sh
+swift test
+```
+
+In the local `hksw` workspace, preview both libraries with the sibling preview host:
+
+```sh
+cd ../PreviewHost
+swift run
+```
 
 ## License
 
