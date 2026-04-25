@@ -50,18 +50,6 @@ public struct WhatsNewBackground {
 }
 
 extension WhatsNewBackground {
-    var spansBehindFooter: Bool {
-        true
-    }
-
-    var footerSurfaceStyle: AnyShapeStyle {
-        AnyShapeStyle(.clear)
-    }
-
-    var footerFadeEndColor: Color {
-        .clear
-    }
-
     func makeView(context: WhatsNewBackgroundContext) -> AnyView {
         switch self.storage {
         case .system:

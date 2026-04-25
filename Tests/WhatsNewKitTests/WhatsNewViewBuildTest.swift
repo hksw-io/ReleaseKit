@@ -164,12 +164,19 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
-    func allBackgroundsSpanBehindFooterSurface() {
-        #expect(WhatsNewBackground.system.spansBehindFooter)
-        #expect(WhatsNewBackground.softGradient.spansBehindFooter)
-        #expect(WhatsNewBackground.linearGradient(colors: [.blue, .mint]).spansBehindFooter)
-        #expect(WhatsNewBackground.animatedMesh().spansBehindFooter)
-        #expect(WhatsNewBackground.custom { _ in Color.blue }.spansBehindFooter)
+    func footerMaskHeightQuantizesToWholePoints() {
+        #expect(FooterMaskMetrics.quantizedHeight(123.4) == 123)
+        #expect(FooterMaskMetrics.quantizedHeight(123.5) == 124)
+    }
+
+    @Test
+    func footerMaskFadeBottomIsHiddenWhenScrollableContentContinues() {
+        #expect(FooterMaskMetrics.fadeBottomOpacity(scrollEdgeFadeOpacity: 1) == 0)
+    }
+
+    @Test
+    func footerMaskFadeBottomIsVisibleAtScrollEnd() {
+        #expect(FooterMaskMetrics.fadeBottomOpacity(scrollEdgeFadeOpacity: 0) == 1)
     }
 
     @Test
