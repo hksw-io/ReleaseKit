@@ -107,6 +107,27 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func viewConstructsWithStandardStyleModifier() {
+        _ = WhatsNewView(content: StyledContent(), onDismiss: {})
+            .whatsNewStyle(.standard)
+    }
+
+    @Test
+    func viewConstructsWithCustomStyleColors() {
+        let style = WhatsNewStyle(
+            tint: .indigo,
+            titleColor: .primary,
+            featureIconColor: .mint,
+            featureTitleColor: .primary,
+            featureDescriptionColor: .secondary,
+            noticeColor: .secondary,
+            buttonForegroundColor: .white)
+
+        _ = WhatsNewView(content: StyledContent(), onDismiss: {})
+            .whatsNewStyle(style)
+    }
+
+    @Test
     func featureInitializerStoresStableID() {
         let feature = WhatsNewFeature(
             id: "stable-feature",
@@ -172,5 +193,20 @@ struct WhatsNewViewBuildTest {
 
         #expect(padding == 24)
     }
+}
+
+private struct StyledContent: WhatsNewContent {
+    var title: Text { Text("Styled") }
+    var features: [WhatsNewFeature] {
+        [
+            WhatsNewFeature(
+                id: "styled-feature",
+                image: Image(systemName: "paintpalette.fill"),
+                label: Text("Styled feature"),
+                description: Text("This feature checks custom style construction.")),
+        ]
+    }
+    var notice: WhatsNewNotice? { WhatsNewNotice(text: Text("Styled notice")) }
+    var buttonText: Text { Text("Done") }
 }
 #endif

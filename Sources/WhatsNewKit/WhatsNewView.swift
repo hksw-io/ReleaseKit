@@ -4,6 +4,7 @@ import SwiftUI
 public struct WhatsNewView<Content: WhatsNewContent>: View {
     let content: Content
     let onDismiss: () -> Void
+    private var style: WhatsNewStyle = .standard
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var featuresVisible = false
@@ -31,13 +32,15 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                 VStack(spacing: self.contentSpacing) {
                     WhatsNewHeaderSection(
                         content: self.content,
-                        iconSize: self.iconSize)
+                        iconSize: self.iconSize,
+                        style: self.style)
                     WhatsNewFeatureList(
                         features: self.content.features,
                         featureSpacing: self.featureSpacing,
                         featureIconSize: self.featureIconSize,
                         featuresVisible: self.featuresVisible,
-                        reduceMotion: self.reduceMotion)
+                        reduceMotion: self.reduceMotion,
+                        style: self.style)
                 }
                 .frame(maxWidth: Tokens.Layout.contentMaxWidth)
                 .frame(maxWidth: .infinity)
@@ -62,6 +65,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                     WhatsNewFooterSection(
                         content: self.content,
                         buttonPadding: self.buttonPadding,
+                        style: self.style,
                         onDismiss: self.onDismiss)
                         .frame(maxWidth: Tokens.Layout.contentMaxWidth)
                         .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
@@ -85,12 +89,19 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .interactiveDismissDisabled()
+        .whatsNewTint(self.style.tint)
         #if os(macOS)
             .frame(minWidth: Tokens.Layout.compactSheetMinWidth, minHeight: 560)
         #endif
             .onAppear {
                 self.featuresVisible = true
             }
+    }
+
+    public func whatsNewStyle(_ style: WhatsNewStyle) -> Self {
+        var view = self
+        view.style = style
+        return view
     }
 
     private func horizontalPadding(for width: CGFloat) -> CGFloat {
@@ -144,6 +155,7 @@ enum ScrollEdgeFade {
 private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
     let content: Content
     let iconSize: CGFloat
+    let style: WhatsNewStyle
 
     var body: some View {
         VStack(spacing: Tokens.Spacing.large) {
@@ -165,6 +177,7 @@ private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
                 .font(.largeTitle)
             #endif
                 .fontWeight(.bold)
+                .whatsNewOptionalForegroundStyle(self.style.titleColor)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
@@ -178,6 +191,7 @@ private struct WhatsNewFeatureList: View {
     let featureIconSize: CGFloat
     let featuresVisible: Bool
     let reduceMotion: Bool
+    let style: WhatsNewStyle
 
     var body: some View {
         VStack(spacing: self.featureSpacing) {
@@ -187,7 +201,8 @@ private struct WhatsNewFeatureList: View {
                     index: index,
                     featureIconSize: self.featureIconSize,
                     featuresVisible: self.featuresVisible,
-                    reduceMotion: self.reduceMotion)
+                    reduceMotion: self.reduceMotion,
+                    style: self.style)
             }
         }
     }
@@ -199,6 +214,7 @@ private struct WhatsNewFeatureRow: View {
     let featureIconSize: CGFloat
     let featuresVisible: Bool
     let reduceMotion: Bool
+    let style: WhatsNewStyle
 
     var body: some View {
         let delay = Tokens.Motion.revealDelay(for: self.index)
@@ -211,7 +227,7 @@ private struct WhatsNewFeatureRow: View {
                     .scaledToFit()
                     .symbolRenderingMode(.hierarchical)
                     .frame(width: self.featureIconSize, height: self.featureIconSize)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(self.style.featureIconForegroundStyle)
                     .accessibilityHidden(true)
             }
 
@@ -219,11 +235,12 @@ private struct WhatsNewFeatureRow: View {
                 if let label = self.feature.label {
                     label
                         .font(.headline)
+                        .whatsNewOptionalForegroundStyle(self.style.featureTitleColor)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 self.feature.description
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(self.style.featureDescriptionForegroundStyle)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -244,6 +261,7 @@ private struct WhatsNewFeatureRow: View {
 private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
     let content: Content
     let buttonPadding: CGFloat
+    let style: WhatsNewStyle
     let onDismiss: () -> Void
 
     var body: some View {
@@ -251,7 +269,7 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
             if let notice = self.content.notice {
                 notice.text
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(self.style.noticeForegroundStyle)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -262,6 +280,7 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
                     .font(.body.weight(.semibold))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+                    .whatsNewOptionalForegroundStyle(self.style.buttonForegroundColor)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, self.buttonPadding)
             }
@@ -275,6 +294,26 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
             #endif
         }
         .padding(.vertical, Tokens.Layout.footerVerticalPadding)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func whatsNewTint(_ color: Color?) -> some View {
+        if let color {
+            self.tint(color)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func whatsNewOptionalForegroundStyle(_ color: Color?) -> some View {
+        if let color {
+            self.foregroundStyle(color)
+        } else {
+            self
+        }
     }
 }
 

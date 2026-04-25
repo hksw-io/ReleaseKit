@@ -63,6 +63,25 @@ struct RootView: View {
 }
 ```
 
+## Styling
+
+Use `whatsNewStyle(_:)` to override foreground, tint, and button colors while keeping the library's layout, typography, and motion:
+
+```swift
+WhatsNewView(content: MyWhatsNew()) {
+    isShowing = false
+}
+.whatsNewStyle(WhatsNewStyle(
+    tint: .indigo,
+    titleColor: .primary,
+    featureIconColor: .mint,
+    featureDescriptionColor: .secondary,
+    noticeColor: .secondary,
+    buttonForegroundColor: .white))
+```
+
+Any color you leave as `nil` uses the standard system treatment. `tint` controls the prominent button accent and is also used by feature icons unless `featureIconColor` is set.
+
 ## Version tracking
 
 Give every `WhatsNewFeature` a stable `id`. Stable IDs let SwiftUI preserve row identity when features are inserted, removed, or reordered.
