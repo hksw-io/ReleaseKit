@@ -4,6 +4,7 @@ import SwiftUI
 public struct WhatsNewView<Content: WhatsNewContent>: View {
     let content: Content
     let onDismiss: () -> Void
+    private var background: WhatsNewBackground = .system
     private var style: WhatsNewStyle = .standard
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -27,67 +28,74 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
     }
 
     public var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: self.contentSpacing) {
-                    WhatsNewHeaderSection(
-                        content: self.content,
-                        iconSize: self.iconSize,
-                        style: self.style)
-                    WhatsNewFeatureList(
-                        features: self.content.features,
-                        featureSpacing: self.featureSpacing,
-                        featureIconSize: self.featureIconSize,
-                        featuresVisible: self.featuresVisible,
-                        reduceMotion: self.reduceMotion,
-                        style: self.style)
+        ZStack {
+            WhatsNewBackgroundView(
+                background: self.background,
+                reduceMotion: self.reduceMotion)
+
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: self.contentSpacing) {
+                        WhatsNewHeaderSection(
+                            content: self.content,
+                            iconSize: self.iconSize,
+                            style: self.style)
+                        WhatsNewFeatureList(
+                            features: self.content.features,
+                            featureSpacing: self.featureSpacing,
+                            featureIconSize: self.featureIconSize,
+                            featuresVisible: self.featuresVisible,
+                            reduceMotion: self.reduceMotion,
+                            style: self.style)
+                    }
+                    .frame(maxWidth: Tokens.Layout.contentMaxWidth)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
+                    .padding(.top, self.topPadding)
+                    .padding(.bottom, self.bottomPadding)
                 }
-                .frame(maxWidth: Tokens.Layout.contentMaxWidth)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
-                .padding(.top, self.topPadding)
-                .padding(.bottom, self.bottomPadding)
+                .scrollBounceBehavior(.basedOnSize)
+                .onScrollGeometryChange(for: Double.self) { geometry in
+                    ScrollEdgeFade.opacity(
+                        contentHeight: geometry.contentSize.height,
+                        contentBottomInset: geometry.contentInsets.bottom,
+                        visibleMaxY: geometry.visibleRect.maxY,
+                        fadeHeight: self.scrollEdgeFadeHeight)
+                } action: { _, newOpacity in
+                    if self.scrollEdgeFadeOpacity != newOpacity {
+                        self.scrollEdgeFadeOpacity = newOpacity
+                    }
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    ZStack {
+                        WhatsNewFooterSection(
+                            content: self.content,
+                            buttonPadding: self.buttonPadding,
+                            style: self.style,
+                            onDismiss: self.onDismiss)
+                            .frame(maxWidth: Tokens.Layout.contentMaxWidth)
+                            .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(alignment: .top) {
+                        LinearGradient(
+                            colors: [
+                                Tokens.background.opacity(0),
+                                self.background.footerFadeEndColor,
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom)
+                            .frame(height: self.scrollEdgeFadeHeight)
+                            .offset(y: -self.scrollEdgeFadeHeight)
+                            .opacity(self.scrollEdgeFadeOpacity)
+                            .allowsHitTesting(false)
+                    }
+                    .background(self.background.footerSurfaceStyle)
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height)
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .onScrollGeometryChange(for: Double.self) { geometry in
-                ScrollEdgeFade.opacity(
-                    contentHeight: geometry.contentSize.height,
-                    contentBottomInset: geometry.contentInsets.bottom,
-                    visibleMaxY: geometry.visibleRect.maxY,
-                    fadeHeight: self.scrollEdgeFadeHeight)
-            } action: { _, newOpacity in
-                if self.scrollEdgeFadeOpacity != newOpacity {
-                    self.scrollEdgeFadeOpacity = newOpacity
-                }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                ZStack {
-                    WhatsNewFooterSection(
-                        content: self.content,
-                        buttonPadding: self.buttonPadding,
-                        style: self.style,
-                        onDismiss: self.onDismiss)
-                        .frame(maxWidth: Tokens.Layout.contentMaxWidth)
-                        .padding(.horizontal, self.horizontalPadding(for: geometry.size.width))
-                }
-                .frame(maxWidth: .infinity)
-                .background(alignment: .top) {
-                    LinearGradient(
-                        colors: [
-                            Tokens.background.opacity(0),
-                            Tokens.background,
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom)
-                        .frame(height: self.scrollEdgeFadeHeight)
-                        .offset(y: -self.scrollEdgeFadeHeight)
-                        .opacity(self.scrollEdgeFadeOpacity)
-                        .allowsHitTesting(false)
-                }
-                .background(Tokens.background)
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
         }
+        .clipped()
         .interactiveDismissDisabled()
         .whatsNewTint(self.style.tint)
         #if os(macOS)
@@ -96,6 +104,12 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             .onAppear {
                 self.featuresVisible = true
             }
+    }
+
+    public func whatsNewBackground(_ background: WhatsNewBackground) -> Self {
+        var view = self
+        view.background = background
+        return view
     }
 
     public func whatsNewStyle(_ style: WhatsNewStyle) -> Self {
@@ -149,6 +163,17 @@ enum ScrollEdgeFade {
         }
 
         return (opacity / step).rounded() * step
+    }
+}
+
+private struct WhatsNewBackgroundView: View {
+    let background: WhatsNewBackground
+    let reduceMotion: Bool
+
+    var body: some View {
+        self.background
+            .makeView(context: WhatsNewBackgroundContext(reduceMotion: self.reduceMotion))
+            .ignoresSafeArea()
     }
 }
 

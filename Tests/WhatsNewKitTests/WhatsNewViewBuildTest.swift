@@ -128,6 +128,60 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func viewConstructsWithSystemBackgroundModifier() {
+        _ = self.backgroundView(.system)
+    }
+
+    @Test
+    func viewConstructsWithSoftGradientBackground() {
+        _ = self.backgroundView(.softGradient)
+    }
+
+    @Test
+    func viewConstructsWithLinearGradientBackground() {
+        _ = self.backgroundView(.linearGradient(
+            colors: [.blue.opacity(0.18), .mint.opacity(0.12), .clear],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing))
+    }
+
+    @Test
+    func viewConstructsWithAnimatedMeshBackground() {
+        _ = self.backgroundView(.animatedMesh())
+    }
+
+    @Test
+    func viewConstructsWithCustomBackground() {
+        _ = self.backgroundView(.custom { context in
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(context.reduceMotion ? 0.10 : 0.18),
+                    Color.purple.opacity(0.12),
+                ],
+                startPoint: .top,
+                endPoint: .bottom)
+        })
+    }
+
+    @Test
+    func allBackgroundsSpanBehindFooterSurface() {
+        #expect(WhatsNewBackground.system.spansBehindFooter)
+        #expect(WhatsNewBackground.softGradient.spansBehindFooter)
+        #expect(WhatsNewBackground.linearGradient(colors: [.blue, .mint]).spansBehindFooter)
+        #expect(WhatsNewBackground.animatedMesh().spansBehindFooter)
+        #expect(WhatsNewBackground.custom { _ in Color.blue }.spansBehindFooter)
+    }
+
+    @Test
+    func animatedMeshPointsAreStableWithReduceMotion() {
+        let first = WhatsNewAnimatedMeshGeometry.points(phase: 0, reduceMotion: true)
+        let second = WhatsNewAnimatedMeshGeometry.points(phase: 0.5, reduceMotion: true)
+
+        #expect(first[4].x == second[4].x)
+        #expect(first[4].y == second[4].y)
+    }
+
+    @Test
     func featureInitializerStoresStableID() {
         let feature = WhatsNewFeature(
             id: "stable-feature",
@@ -192,6 +246,11 @@ struct WhatsNewViewBuildTest {
             breakpoint: 390)
 
         #expect(padding == 24)
+    }
+
+    private func backgroundView(_ background: WhatsNewBackground) -> some View {
+        WhatsNewView(content: StyledContent(), onDismiss: {})
+            .whatsNewBackground(background)
     }
 }
 

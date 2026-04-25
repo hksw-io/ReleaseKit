@@ -63,6 +63,27 @@ struct RootView: View {
 }
 ```
 
+## Backgrounds
+
+The default background is the system sheet surface. Use `whatsNewBackground(_:)` when an app needs a more branded release note experience:
+
+```swift
+WhatsNewView(content: MyWhatsNew()) {
+    isShowing = false
+}
+.whatsNewBackground(.softGradient)
+```
+
+Built-in options:
+
+- `.system` — the default platform background.
+- `.softGradient` — a restrained blue/mint background tuned for readable content.
+- `.linearGradient(colors:startPoint:endPoint:)` — app-provided colors with the library-managed footer treatment.
+- `.animatedMesh(primary:secondary:accent:)` — an opt-in animated mesh gradient. It automatically becomes static when Reduce Motion is enabled.
+- `.custom { context in ... }` — a fully custom SwiftUI background. Use `context.reduceMotion` to keep custom animations accessible.
+
+Every background spans behind the pinned footer and button area, including `.system`.
+
 ## Styling
 
 Use `whatsNewStyle(_:)` to override foreground, tint, and button colors while keeping the library's layout, typography, and motion:
@@ -80,7 +101,7 @@ WhatsNewView(content: MyWhatsNew()) {
     buttonForegroundColor: .white))
 ```
 
-Any color you leave as `nil` uses the standard system treatment. `tint` controls the prominent button accent and is also used by feature icons unless `featureIconColor` is set.
+`WhatsNewBackground` controls the surface behind the sheet content. `WhatsNewStyle` controls foreground roles such as title, feature rows, notice text, and button text. Any color you leave as `nil` uses the standard system treatment. `tint` controls the prominent button accent and is also used by feature icons unless `featureIconColor` is set.
 
 ## Version tracking
 
