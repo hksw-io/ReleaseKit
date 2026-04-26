@@ -138,6 +138,11 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func viewConstructsWithBrandSoftGradientBackground() {
+        _ = self.backgroundView(.softGradient(brand: .orange))
+    }
+
+    @Test
     func viewConstructsWithLinearGradientBackground() {
         _ = self.backgroundView(.linearGradient(
             colors: [.blue.opacity(0.18), .mint.opacity(0.12), .clear],
@@ -146,8 +151,30 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
-    func viewConstructsWithAnimatedMeshBackground() {
-        _ = self.backgroundView(.animatedMesh())
+    func viewConstructsWithAnimatedGradientBackground() {
+        _ = self.backgroundView(.animatedGradient())
+    }
+
+    @Test
+    func viewConstructsWithExpressiveAnimatedGradientBackground() {
+        _ = self.backgroundView(.animatedGradient(motion: .expressive))
+    }
+
+    @Test
+    func viewConstructsWithGradientPaletteOverride() {
+        let palette = WhatsNewGradientPalette(
+            light: .init(
+                base: .white,
+                primary: .pink,
+                secondary: .orange,
+                accent: .yellow),
+            dark: .init(
+                base: .black,
+                primary: .purple,
+                secondary: .blue,
+                accent: .mint))
+
+        _ = self.backgroundView(.animatedGradient(palette: palette))
     }
 
     @Test
@@ -156,11 +183,25 @@ struct WhatsNewViewBuildTest {
             LinearGradient(
                 colors: [
                     Color.blue.opacity(context.reduceMotion ? 0.10 : 0.18),
-                    Color.purple.opacity(0.12),
+                    context.colorScheme == .dark ? .purple.opacity(0.24) : .purple.opacity(0.12),
                 ],
                 startPoint: .top,
                 endPoint: .bottom)
         })
+    }
+
+    @Test
+    func backgroundContextStoresColorScheme() {
+        let defaultContext = WhatsNewBackgroundContext(reduceMotion: true)
+        let darkContext = WhatsNewBackgroundContext(
+            reduceMotion: false,
+            brandColor: .pink,
+            colorScheme: .dark)
+
+        #expect(defaultContext.reduceMotion)
+        #expect(defaultContext.colorScheme == .light)
+        #expect(!darkContext.reduceMotion)
+        #expect(darkContext.colorScheme == .dark)
     }
 
     @Test
@@ -246,8 +287,14 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func animatedGradientCentersAreStableWithReduceMotion() {
-        let first = WhatsNewAnimatedGradientMotion.centers(phase: 0, reduceMotion: true)
-        let second = WhatsNewAnimatedGradientMotion.centers(phase: 0.5, reduceMotion: true)
+        let first = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0,
+            reduceMotion: true,
+            motion: .expressive)
+        let second = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0.5,
+            reduceMotion: true,
+            motion: .expressive)
 
         #expect(first[0].x == second[0].x)
         #expect(first[0].y == second[0].y)
@@ -259,6 +306,35 @@ struct WhatsNewViewBuildTest {
         let second = WhatsNewAnimatedGradientMotion.centers(phase: 0.25, reduceMotion: false)
 
         #expect(abs(first[0].x - second[0].x) > 0.0001)
+    }
+
+    @Test
+    func expressiveAnimatedGradientMotionTravelsFartherThanSubtleMotion() {
+        let subtleStart = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0,
+            reduceMotion: false,
+            motion: .subtle)
+        let subtleEnd = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0.25,
+            reduceMotion: false,
+            motion: .subtle)
+        let expressiveStart = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0,
+            reduceMotion: false,
+            motion: .expressive)
+        let expressiveEnd = WhatsNewAnimatedGradientMotion.centers(
+            phase: 0.25,
+            reduceMotion: false,
+            motion: .expressive)
+
+        #expect(self.totalTravel(from: expressiveStart, to: expressiveEnd) > self.totalTravel(from: subtleStart, to: subtleEnd))
+    }
+
+    @Test
+    func expressiveAnimatedGradientMotionHasHigherVisualContrastThanSubtleMotion() {
+        #expect(WhatsNewGradientMotion.expressive.baseTintScale > WhatsNewGradientMotion.subtle.baseTintScale)
+        #expect(WhatsNewGradientMotion.expressive.blobOpacityScale > WhatsNewGradientMotion.subtle.blobOpacityScale)
+        #expect(WhatsNewGradientMotion.expressive.blobBlurScale < WhatsNewGradientMotion.subtle.blobBlurScale)
     }
 
     @Test
@@ -339,6 +415,14 @@ struct WhatsNewViewBuildTest {
     private func backgroundView(_ background: WhatsNewBackground) -> some View {
         WhatsNewView(content: StyledContent(), onDismiss: {})
             .whatsNewBackground(background)
+    }
+
+    private func totalTravel(from first: [CGPoint], to second: [CGPoint]) -> Double {
+        zip(first, second).reduce(0) { total, pair in
+            let xDistance = Double(pair.0.x - pair.1.x)
+            let yDistance = Double(pair.0.y - pair.1.y)
+            return total + ((xDistance * xDistance) + (yDistance * yDistance)).squareRoot()
+        }
     }
 }
 

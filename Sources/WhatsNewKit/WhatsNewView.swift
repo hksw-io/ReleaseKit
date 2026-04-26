@@ -8,6 +8,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
     private var style: WhatsNewStyle = .standard
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
     @State private var featuresVisible = false
     @State private var scrollEdgeFadeOpacity: Double = 1
     @State private var footerFrame: FooterMaskFrame = .zero
@@ -32,7 +33,9 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
         ZStack {
             WhatsNewBackgroundView(
                 background: self.background,
-                reduceMotion: self.reduceMotion)
+                reduceMotion: self.reduceMotion,
+                brandColor: self.style.tint,
+                colorScheme: self.colorScheme)
 
             GeometryReader { geometry in
                 ScrollView {
@@ -103,6 +106,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             }
         }
         .clipped()
+        .scrollIndicators(.hidden)
         .interactiveDismissDisabled()
         .whatsNewTint(self.style.tint)
         #if os(macOS)
@@ -300,10 +304,15 @@ private struct FooterContentMask: View {
 private struct WhatsNewBackgroundView: View {
     let background: WhatsNewBackground
     let reduceMotion: Bool
+    let brandColor: Color?
+    let colorScheme: ColorScheme
 
     var body: some View {
         self.background
-            .makeView(context: WhatsNewBackgroundContext(reduceMotion: self.reduceMotion))
+            .makeView(context: WhatsNewBackgroundContext(
+                reduceMotion: self.reduceMotion,
+                brandColor: self.brandColor,
+                colorScheme: self.colorScheme))
             .ignoresSafeArea()
     }
 }
