@@ -1,7 +1,7 @@
 #if os(iOS) || os(macOS)
 import SwiftUI
 import Testing
-@testable import WhatsNewKit
+@testable import ReleaseKit
 
 @MainActor
 struct WhatsNewViewBuildTest {

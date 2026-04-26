@@ -20,7 +20,7 @@ Instructions for agents working in this repository. RFC 2119 keywords apply.
 - Use system materials, typography, controls, and symbols in ways that feel native on iOS 26+ and macOS 26+. Do not add custom visual systems unless the user asks for one.
 - Keep public API names, defaults, and initializer behavior stable unless the requested change explicitly requires a breaking change.
 
-## WhatsNewKit Rules
+## ReleaseKit Rules
 
 - `WhatsNewView` should remain a reusable SwiftUI view driven by `WhatsNewContent`.
 - `WhatsNewVersionTracker` owns only version display tracking. Keep persistence behavior deterministic and covered by tests.

@@ -1,6 +1,17 @@
-# WhatsNewKit
+# ReleaseKit
 
 A reusable SwiftUI "What's New" sheet for iOS and macOS apps in the HK Softworks portfolio.
+
+The package and import name is `ReleaseKit`. Public view and content APIs intentionally use the
+domain language `WhatsNew...`, for example `WhatsNewView`, `WhatsNewContent`, and
+`WhatsNewVersionTracker`.
+
+## Preview
+
+<p>
+  <img src="Docs/Media/releasekit-animated-gradient.png" alt="ReleaseKit with an animated gradient background, long localized content, footer fade, and pinned action button." width="360">
+  <img src="Docs/Media/releasekit-system-long-content.png" alt="ReleaseKit with the system background, long localized content, footer fade, and pinned action button." width="360">
+</p>
 
 ## Requirements
 
@@ -12,13 +23,13 @@ A reusable SwiftUI "What's New" sheet for iOS and macOS apps in the HK Softworks
 No release tags are published yet, so use the `master` branch for now:
 
 ```swift
-.package(url: "https://github.com/hksw-io/WhatsNewKit.git", branch: "master")
+.package(url: "https://github.com/hksw-io/ReleaseKit.git", branch: "master")
 ```
 
 Switch to a semantic version requirement after the first release tag exists:
 
 ```swift
-.package(url: "https://github.com/hksw-io/WhatsNewKit.git", from: "1.0.0")
+.package(url: "https://github.com/hksw-io/ReleaseKit.git", from: "1.0.0")
 ```
 
 Or in Xcode: **File > Add Package Dependencies**, enter the URL above, and select the `master` branch until a release tag is available.
@@ -29,7 +40,7 @@ Implement `WhatsNewContent` with your app's strings and icon, then present the v
 
 ```swift
 import SwiftUI
-import WhatsNewKit
+import ReleaseKit
 
 struct MyWhatsNew: WhatsNewContent {
     var appIcon: Image? { Image("AppIconImage") }
@@ -78,14 +89,14 @@ WhatsNewView(content: MyWhatsNew()) {
 Built-in options:
 
 - `.system` — the default platform background.
-- `.softGradient` — a restrained brand-derived background tuned for readable content.
+- `.softGradient` / `.softGradient(brand:palette:)` — a restrained brand-derived background tuned for readable content.
 - `.linearGradient(colors:startPoint:endPoint:)` — app-provided colors with the library-managed footer treatment.
 - `.animatedGradient(brand:palette:motion:)` — an opt-in smooth full-surface animated gradient. It uses the style tint by default, adapts its tones for light and dark mode, and automatically becomes static when Reduce Motion is enabled.
 - `.custom { context in ... }` — a fully custom SwiftUI background. Use `context.reduceMotion`, `context.brandColor`, and `context.colorScheme` to keep custom backgrounds consistent and accessible.
 
-Every background spans behind the pinned footer and button area, including `.system`.
+Every background spans behind the pinned footer and button area, including `.system`. Scroll indicators are hidden on supported platforms so branded sheets do not show a macOS scrollbar over the content.
 
-`Style.tint` is the default brand color for `.softGradient` and `.animatedGradient()`. Pass `brand:` when the background should use a different brand color from the controls, or pass a full palette when an app needs exact light and dark tones:
+`WhatsNewStyle.tint` is the default brand color for `.softGradient` and `.animatedGradient()`. Pass `brand:` when the background should use a different brand color from the controls, or pass a full palette when an app needs exact light and dark tones:
 
 ```swift
 let palette = WhatsNewGradientPalette(
@@ -115,9 +126,11 @@ WhatsNewView(content: MyWhatsNew()) {
 .whatsNewBackground(.animatedGradient(motion: .expressive))
 ```
 
-The built-in presets are `.subtle`, `.standard`, and `.expressive`. Stronger motion increases movement, speed, and gradient contrast. For finer control, pass `WhatsNewGradientMotion(strength:)`.
+The built-in presets are `.subtle`, `.standard`, and `.expressive`. Stronger motion increases movement, speed, and gradient contrast. For finer control, pass `WhatsNewGradientMotion(strength:)`; values are clamped from `0` to `2`, and `0` keeps the animated-gradient color field static.
 
 `.animatedMesh(primary:secondary:accent:)` remains available as a deprecated compatibility alias for `.animatedGradient(palette:motion:)`.
+
+ReleaseKit keeps the footer pinned while content scrolls behind it. A measured footer mask fades overflowing content only above the footer; when scrolling reaches the end, visible content is fully opaque again.
 
 ## Styling
 
@@ -141,6 +154,8 @@ WhatsNewView(content: MyWhatsNew()) {
 ## Version tracking
 
 Give every `WhatsNewFeature` a stable `id`. Stable IDs let SwiftUI preserve row identity when features are inserted, removed, or reordered.
+
+`WhatsNewFeature` has `Text` and `LocalizedStringResource` initializers. Prefer the initializer with an explicit `id`; the old ID-less initializers remain only for compatibility and are deprecated.
 
 `WhatsNewVersionTracker` persists the last-shown version in `UserDefaults` and decides whether to present the sheet on launch:
 

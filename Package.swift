@@ -2,20 +2,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "WhatsNewKit",
+    name: "ReleaseKit",
     platforms: [
         .iOS(.v26),
         .macOS(.v26),
     ],
     products: [
         .library(
-            name: "WhatsNewKit",
-            targets: ["WhatsNewKit"]),
+            name: "ReleaseKit",
+            targets: ["ReleaseKit"]),
     ],
     targets: [
         .target(
-            name: "WhatsNewKit"),
+            name: "ReleaseKit"),
         .testTarget(
-            name: "WhatsNewKitTests",
-            dependencies: ["WhatsNewKit"]),
+            name: "ReleaseKitTests",
+            dependencies: ["ReleaseKit"]),
     ])

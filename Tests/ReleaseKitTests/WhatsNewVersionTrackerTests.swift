@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import WhatsNewKit
+@testable import ReleaseKit
 
 @Suite(.serialized)
 struct WhatsNewVersionTrackerTests {
