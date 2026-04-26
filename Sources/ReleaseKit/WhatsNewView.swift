@@ -445,18 +445,18 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
                     .font(.body.weight(.semibold))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                    .whatsNewOptionalForegroundStyle(self.style.buttonForegroundColor)
+                    .foregroundStyle(self.style.buttonForegroundStyle)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, self.buttonPadding)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
             .controlSize(.extraLarge)
-            #if os(macOS)
-                .environment(\.controlActiveState, .key)
-                .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.large))
-            #else
-                .glassEffect(in: .rect(cornerRadius: Tokens.Radius.large))
-            #endif
+            .background {
+                RoundedRectangle(cornerRadius: Tokens.Radius.large, style: .continuous)
+                    .fill(self.style.buttonBackgroundStyle)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.large, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: Tokens.Radius.large, style: .continuous))
         }
         .padding(.vertical, Tokens.Layout.footerVerticalPadding)
     }

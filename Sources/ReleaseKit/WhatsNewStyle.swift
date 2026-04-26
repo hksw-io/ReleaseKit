@@ -46,6 +46,14 @@ extension WhatsNewStyle {
         Self.foregroundStyle(for: self.noticeColor, fallback: AnyShapeStyle(.secondary))
     }
 
+    var buttonForegroundStyle: AnyShapeStyle {
+        Self.foregroundStyle(for: self.buttonForegroundColor, fallback: AnyShapeStyle(.white))
+    }
+
+    var buttonBackgroundStyle: AnyShapeStyle {
+        Self.foregroundStyle(for: self.tint, fallback: AnyShapeStyle(.tint))
+    }
+
     private static func foregroundStyle(for color: Color?, fallback: AnyShapeStyle) -> AnyShapeStyle {
         guard let color else {
             return fallback

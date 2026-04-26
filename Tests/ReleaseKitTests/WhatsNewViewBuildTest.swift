@@ -128,6 +128,14 @@ struct WhatsNewViewBuildTest {
     }
 
     @Test
+    func styleProvidesCustomButtonSurface() {
+        let style = WhatsNewStyle(tint: .indigo, buttonForegroundColor: .white)
+
+        _ = style.buttonBackgroundStyle
+        _ = style.buttonForegroundStyle
+    }
+
+    @Test
     func viewConstructsWithSystemBackgroundModifier() {
         _ = self.backgroundView(.system)
     }
