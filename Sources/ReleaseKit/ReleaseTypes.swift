@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct WhatsNewFeature: Identifiable {
+public struct ReleaseFeature: Identifiable {
     public let id: String
     public let image: Image?
     public let label: Text?
@@ -44,7 +44,7 @@ public struct WhatsNewFeature: Identifiable {
     }
 }
 
-public struct WhatsNewNotice {
+public struct ReleaseNotice {
     public let text: Text
 
     public init(text: Text) {
@@ -52,15 +52,15 @@ public struct WhatsNewNotice {
     }
 }
 
-public protocol WhatsNewContent {
+public protocol ReleaseContent {
     var appIcon: Image? { get }
     var title: Text { get }
-    var features: [WhatsNewFeature] { get }
-    var notice: WhatsNewNotice? { get }
+    var features: [ReleaseFeature] { get }
+    var notice: ReleaseNotice? { get }
     var buttonText: Text { get }
 }
 
-public extension WhatsNewContent {
+public extension ReleaseContent {
     var appIcon: Image? {
         nil
     }

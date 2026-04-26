@@ -1,6 +1,6 @@
 import Foundation
 
-public struct WhatsNewVersionTracker {
+public struct ReleaseVersionTracker {
     private let userDefaults: UserDefaults
     private let currentVersion: String
     private let lastShownVersionKey: String
@@ -13,11 +13,11 @@ public struct WhatsNewVersionTracker {
     {
         self.userDefaults = userDefaults
         self.currentVersion = currentVersion
-        self.lastShownVersionKey = "\(keyPrefix).whatsNew.lastShownVersion"
+        self.lastShownVersionKey = "\(keyPrefix).release.lastShownVersion"
         self.hasLaunchedBeforeKey = "\(keyPrefix).hasLaunchedBefore"
     }
 
-    public func shouldShowWhatsNew() -> Bool {
+    public func shouldShowRelease() -> Bool {
         let hasLaunchedBefore = self.userDefaults.bool(forKey: self.hasLaunchedBeforeKey)
         if !hasLaunchedBefore {
             self.userDefaults.set(true, forKey: self.hasLaunchedBeforeKey)

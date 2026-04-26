@@ -3,8 +3,8 @@
 A reusable SwiftUI "What's New" sheet for iOS and macOS apps in the HK Softworks portfolio.
 
 The package and import name is `ReleaseKit`. Public view and content APIs intentionally use the
-domain language `WhatsNew...`, for example `WhatsNewView`, `WhatsNewContent`, and
-`WhatsNewVersionTracker`.
+domain language `Release...`, for example `ReleaseView`, `ReleaseContent`, and
+`ReleaseVersionTracker`.
 
 ## Preview
 
@@ -36,26 +36,26 @@ Or in Xcode: **File > Add Package Dependencies**, enter the URL above, and selec
 
 ## Usage
 
-Implement `WhatsNewContent` with your app's strings and icon, then present the view:
+Implement `ReleaseContent` with your app's strings and icon, then present the view:
 
 ```swift
 import SwiftUI
 import ReleaseKit
 
-struct MyWhatsNew: WhatsNewContent {
+struct MyRelease: ReleaseContent {
     var appIcon: Image? { Image("AppIconImage") }
     var title: Text { Text("What's New in MyApp") }
-    var features: [WhatsNewFeature] {
+    var features: [ReleaseFeature] {
         [
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "new-charts",
                 systemImage: "chart.line.uptrend.xyaxis.circle",
                 label: "New Charts",
                 description: "Track your progress with redesigned charts."),
         ]
     }
-    var notice: WhatsNewNotice? {
-        WhatsNewNotice(text: Text("Plus many other improvements."))
+    var notice: ReleaseNotice? {
+        ReleaseNotice(text: Text("Plus many other improvements."))
     }
     var buttonText: Text { Text("Continue") }
 }
@@ -66,7 +66,7 @@ struct RootView: View {
     var body: some View {
         ContentView()
             .sheet(isPresented: $isShowing) {
-                WhatsNewView(content: MyWhatsNew()) {
+                ReleaseView(content: MyRelease()) {
                     isShowing = false
                 }
             }
@@ -76,14 +76,14 @@ struct RootView: View {
 
 ## Backgrounds
 
-The default background is the system sheet surface. Use `whatsNewBackground(_:)` when an app needs a more branded release note experience:
+The default background is the system sheet surface. Use `releaseBackground(_:)` when an app needs a more branded release note experience:
 
 ```swift
-WhatsNewView(content: MyWhatsNew()) {
+ReleaseView(content: MyRelease()) {
     isShowing = false
 }
-.whatsNewBackground(.animatedGradient())
-.whatsNewStyle(WhatsNewStyle(tint: .indigo))
+.releaseBackground(.animatedGradient())
+.releaseStyle(ReleaseStyle(tint: .indigo))
 ```
 
 Built-in options:
@@ -96,10 +96,10 @@ Built-in options:
 
 Every background spans behind the pinned footer and button area, including `.system`. Scroll indicators are hidden on supported platforms so branded sheets do not show a macOS scrollbar over the content.
 
-`WhatsNewStyle.tint` is the default brand color for `.softGradient` and `.animatedGradient()`. Pass `brand:` when the background should use a different brand color from the controls, or pass a full palette when an app needs exact light and dark tones:
+`ReleaseStyle.tint` is the default brand color for `.softGradient` and `.animatedGradient()`. Pass `brand:` when the background should use a different brand color from the controls, or pass a full palette when an app needs exact light and dark tones:
 
 ```swift
-let palette = WhatsNewGradientPalette(
+let palette = ReleaseGradientPalette(
     light: .init(
         base: .white,
         primary: .pink,
@@ -111,22 +111,22 @@ let palette = WhatsNewGradientPalette(
         secondary: .purple,
         accent: .cyan))
 
-WhatsNewView(content: MyWhatsNew()) {
+ReleaseView(content: MyRelease()) {
     isShowing = false
 }
-.whatsNewBackground(.animatedGradient(palette: palette))
+.releaseBackground(.animatedGradient(palette: palette))
 ```
 
 Use `motion:` when the default dancing gradient should be calmer or more expressive:
 
 ```swift
-WhatsNewView(content: MyWhatsNew()) {
+ReleaseView(content: MyRelease()) {
     isShowing = false
 }
-.whatsNewBackground(.animatedGradient(motion: .expressive))
+.releaseBackground(.animatedGradient(motion: .expressive))
 ```
 
-The built-in presets are `.subtle`, `.standard`, and `.expressive`. Stronger motion increases movement, speed, and gradient contrast. For finer control, pass `WhatsNewGradientMotion(strength:)`; values are clamped from `0` to `2`, and `0` keeps the animated-gradient color field static.
+The built-in presets are `.subtle`, `.standard`, and `.expressive`. Stronger motion increases movement, speed, and gradient contrast. For finer control, pass `ReleaseGradientMotion(strength:)`; values are clamped from `0` to `2`, and `0` keeps the animated-gradient color field static.
 
 `.animatedMesh(primary:secondary:accent:)` remains available as a deprecated compatibility alias for `.animatedGradient(palette:motion:)`.
 
@@ -134,13 +134,13 @@ ReleaseKit keeps the footer pinned while content scrolls behind it. A measured f
 
 ## Styling
 
-Use `whatsNewStyle(_:)` to override foreground, tint, and button colors while keeping the library's layout, typography, and motion:
+Use `releaseStyle(_:)` to override foreground, tint, and button colors while keeping the library's layout, typography, and motion:
 
 ```swift
-WhatsNewView(content: MyWhatsNew()) {
+ReleaseView(content: MyRelease()) {
     isShowing = false
 }
-.whatsNewStyle(WhatsNewStyle(
+.releaseStyle(ReleaseStyle(
     tint: .indigo,
     titleColor: .primary,
     featureIconColor: .mint,
@@ -149,23 +149,23 @@ WhatsNewView(content: MyWhatsNew()) {
     buttonForegroundColor: .white))
 ```
 
-`WhatsNewBackground` controls the surface behind the sheet content. `WhatsNewStyle` controls foreground roles such as title, feature rows, notice text, and button text. Any color you leave as `nil` uses the standard system treatment. `tint` controls the prominent button accent and is also used by feature icons unless `featureIconColor` is set.
+`ReleaseBackground` controls the surface behind the sheet content. `ReleaseStyle` controls foreground roles such as title, feature rows, notice text, and button text. Any color you leave as `nil` uses the standard system treatment. `tint` controls the prominent button accent and is also used by feature icons unless `featureIconColor` is set.
 
 ## Version tracking
 
-Give every `WhatsNewFeature` a stable `id`. Stable IDs let SwiftUI preserve row identity when features are inserted, removed, or reordered.
+Give every `ReleaseFeature` a stable `id`. Stable IDs let SwiftUI preserve row identity when features are inserted, removed, or reordered.
 
-`WhatsNewFeature` has `Text` and `LocalizedStringResource` initializers. Prefer the initializer with an explicit `id`; the old ID-less initializers remain only for compatibility and are deprecated.
+`ReleaseFeature` has `Text` and `LocalizedStringResource` initializers. Prefer the initializer with an explicit `id`; the old ID-less initializers remain only for compatibility and are deprecated.
 
-`WhatsNewVersionTracker` persists the last-shown version in `UserDefaults` and decides whether to present the sheet on launch:
+`ReleaseVersionTracker` persists the last-shown version in `UserDefaults` and decides whether to present the sheet on launch:
 
 ```swift
-let tracker = WhatsNewVersionTracker(
+let tracker = ReleaseVersionTracker(
     keyPrefix: "com.example.myapp",
     currentVersion: "1.2.0")
 
-if tracker.shouldShowWhatsNew() {
-    // present WhatsNewView
+if tracker.shouldShowRelease() {
+    // present ReleaseView
 }
 
 // after dismiss:

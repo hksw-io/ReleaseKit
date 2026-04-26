@@ -22,8 +22,8 @@ Instructions for agents working in this repository. RFC 2119 keywords apply.
 
 ## ReleaseKit Rules
 
-- `WhatsNewView` should remain a reusable SwiftUI view driven by `WhatsNewContent`.
-- `WhatsNewVersionTracker` owns only version display tracking. Keep persistence behavior deterministic and covered by tests.
+- `ReleaseView` should remain a reusable SwiftUI view driven by `ReleaseContent`.
+- `ReleaseVersionTracker` owns only version display tracking. Keep persistence behavior deterministic and covered by tests.
 - The first launch behavior is intentional: the sheet is not shown on fresh install, and the current version is marked as seen.
 - Feature rows must keep stable identity and work with optional icons, labels, notices, and long localized text.
 - Dismissal remains caller-controlled through the `onDismiss` closure.

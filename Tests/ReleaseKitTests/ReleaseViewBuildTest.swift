@@ -4,72 +4,72 @@ import Testing
 @testable import ReleaseKit
 
 @MainActor
-struct WhatsNewViewBuildTest {
+struct ReleaseViewBuildTest {
     @Test
     func viewConstructsWithMockContent() {
-        struct MockContent: WhatsNewContent {
+        struct MockContent: ReleaseContent {
             var title: Text { Text("Mock") }
-            var features: [WhatsNewFeature] {
-                [WhatsNewFeature(id: "single", description: Text("Single feature."))]
+            var features: [ReleaseFeature] {
+                [ReleaseFeature(id: "single", description: Text("Single feature."))]
             }
-            var notice: WhatsNewNotice? { nil }
+            var notice: ReleaseNotice? { nil }
             var buttonText: Text { Text("OK") }
         }
 
-        _ = WhatsNewView(content: MockContent(), onDismiss: {})
+        _ = ReleaseView(content: MockContent(), onDismiss: {})
     }
 
     @Test
     func viewConstructsWithAllOptionalFields() {
-        struct RichContent: WhatsNewContent {
+        struct RichContent: ReleaseContent {
             var appIcon: Image? { Image(systemName: "app.gift.fill") }
             var title: Text { Text("Rich") }
-            var features: [WhatsNewFeature] {
+            var features: [ReleaseFeature] {
                 [
-                    WhatsNewFeature(
+                    ReleaseFeature(
                         id: "labeled",
                         image: Image(systemName: "star"),
                         label: Text("Labeled"),
                         description: Text("With label and image.")),
                 ]
             }
-            var notice: WhatsNewNotice? { WhatsNewNotice(text: Text("Notice")) }
+            var notice: ReleaseNotice? { ReleaseNotice(text: Text("Notice")) }
             var buttonText: Text { Text("Continue") }
         }
 
-        _ = WhatsNewView(content: RichContent(), onDismiss: {})
+        _ = ReleaseView(content: RichContent(), onDismiss: {})
     }
 
     @Test
     func viewConstructsWithConvenienceFeatureInitializer() {
-        struct ConvenienceContent: WhatsNewContent {
+        struct ConvenienceContent: ReleaseContent {
             var title: Text { Text("Convenience") }
-            var features: [WhatsNewFeature] {
+            var features: [ReleaseFeature] {
                 [
-                    WhatsNewFeature(
+                    ReleaseFeature(
                         id: "localized-label",
                         systemImage: "sparkles",
                         label: "Localized label",
                         description: "Localized description."),
                 ]
             }
-            var notice: WhatsNewNotice? { nil }
+            var notice: ReleaseNotice? { nil }
             var buttonText: Text { Text("OK") }
         }
 
-        _ = WhatsNewView(content: ConvenienceContent(), onDismiss: {})
+        _ = ReleaseView(content: ConvenienceContent(), onDismiss: {})
     }
 
     @Test
     func viewConstructsWithLongLocalizedContentAndManyFeatures() {
-        struct LongContent: WhatsNewContent {
+        struct LongContent: ReleaseContent {
             var appIcon: Image? { Image(systemName: "sparkles") }
             var title: Text {
                 Text("A much longer What's New title that needs to wrap cleanly on compact devices")
             }
-            var features: [WhatsNewFeature] {
+            var features: [ReleaseFeature] {
                 (1...12).map { index in
-                    WhatsNewFeature(
+                    ReleaseFeature(
                         id: "feature-\(index)",
                         image: Image(systemName: "star.circle.fill"),
                         label: Text("Feature \(index) with a longer localized label"),
@@ -77,44 +77,44 @@ struct WhatsNewViewBuildTest {
                             "This feature description is intentionally longer so the row has to wrap without clipping, overlapping, or pushing controls off screen."))
                 }
             }
-            var notice: WhatsNewNotice? {
-                WhatsNewNotice(text: Text("This notice is also long enough to wrap over multiple lines in a narrow sheet."))
+            var notice: ReleaseNotice? {
+                ReleaseNotice(text: Text("This notice is also long enough to wrap over multiple lines in a narrow sheet."))
             }
             var buttonText: Text {
                 Text("Continue with all of these new improvements")
             }
         }
 
-        _ = WhatsNewView(content: LongContent(), onDismiss: {})
+        _ = ReleaseView(content: LongContent(), onDismiss: {})
     }
 
     @Test
     func viewConstructsWhenComputedFeaturesRecreateValues() {
-        struct ComputedContent: WhatsNewContent {
+        struct ComputedContent: ReleaseContent {
             var title: Text { Text("Computed") }
-            var features: [WhatsNewFeature] {
+            var features: [ReleaseFeature] {
                 [
-                    WhatsNewFeature(id: "first", description: Text("First computed feature.")),
-                    WhatsNewFeature(id: "second", description: Text("Second computed feature.")),
-                    WhatsNewFeature(id: "third", description: Text("Third computed feature.")),
+                    ReleaseFeature(id: "first", description: Text("First computed feature.")),
+                    ReleaseFeature(id: "second", description: Text("Second computed feature.")),
+                    ReleaseFeature(id: "third", description: Text("Third computed feature.")),
                 ]
             }
-            var notice: WhatsNewNotice? { nil }
+            var notice: ReleaseNotice? { nil }
             var buttonText: Text { Text("Done") }
         }
 
-        _ = WhatsNewView(content: ComputedContent(), onDismiss: {})
+        _ = ReleaseView(content: ComputedContent(), onDismiss: {})
     }
 
     @Test
     func viewConstructsWithStandardStyleModifier() {
-        _ = WhatsNewView(content: StyledContent(), onDismiss: {})
-            .whatsNewStyle(.standard)
+        _ = ReleaseView(content: StyledContent(), onDismiss: {})
+            .releaseStyle(.standard)
     }
 
     @Test
     func viewConstructsWithCustomStyleColors() {
-        let style = WhatsNewStyle(
+        let style = ReleaseStyle(
             tint: .indigo,
             titleColor: .primary,
             featureIconColor: .mint,
@@ -123,13 +123,13 @@ struct WhatsNewViewBuildTest {
             noticeColor: .secondary,
             buttonForegroundColor: .white)
 
-        _ = WhatsNewView(content: StyledContent(), onDismiss: {})
-            .whatsNewStyle(style)
+        _ = ReleaseView(content: StyledContent(), onDismiss: {})
+            .releaseStyle(style)
     }
 
     @Test
     func styleProvidesCustomButtonSurface() {
-        let style = WhatsNewStyle(tint: .indigo, buttonForegroundColor: .white)
+        let style = ReleaseStyle(tint: .indigo, buttonForegroundColor: .white)
 
         _ = style.buttonBackgroundStyle
         _ = style.buttonForegroundStyle
@@ -170,7 +170,7 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func viewConstructsWithGradientPaletteOverride() {
-        let palette = WhatsNewGradientPalette(
+        let palette = ReleaseGradientPalette(
             light: .init(
                 base: .white,
                 primary: .pink,
@@ -200,8 +200,8 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func backgroundContextStoresColorScheme() {
-        let defaultContext = WhatsNewBackgroundContext(reduceMotion: true)
-        let darkContext = WhatsNewBackgroundContext(
+        let defaultContext = ReleaseBackgroundContext(reduceMotion: true)
+        let darkContext = ReleaseBackgroundContext(
             reduceMotion: false,
             brandColor: .pink,
             colorScheme: .dark)
@@ -311,11 +311,11 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func animatedGradientCentersAreStableWithReduceMotion() {
-        let first = WhatsNewAnimatedGradientMotion.centers(
+        let first = ReleaseAnimatedGradientMotion.centers(
             phase: 0,
             reduceMotion: true,
             motion: .expressive)
-        let second = WhatsNewAnimatedGradientMotion.centers(
+        let second = ReleaseAnimatedGradientMotion.centers(
             phase: 0.5,
             reduceMotion: true,
             motion: .expressive)
@@ -326,27 +326,27 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func animatedGradientCentersChangeAcrossPhases() {
-        let first = WhatsNewAnimatedGradientMotion.centers(phase: 0, reduceMotion: false)
-        let second = WhatsNewAnimatedGradientMotion.centers(phase: 0.25, reduceMotion: false)
+        let first = ReleaseAnimatedGradientMotion.centers(phase: 0, reduceMotion: false)
+        let second = ReleaseAnimatedGradientMotion.centers(phase: 0.25, reduceMotion: false)
 
         #expect(abs(first[0].x - second[0].x) > 0.0001)
     }
 
     @Test
     func expressiveAnimatedGradientMotionTravelsFartherThanSubtleMotion() {
-        let subtleStart = WhatsNewAnimatedGradientMotion.centers(
+        let subtleStart = ReleaseAnimatedGradientMotion.centers(
             phase: 0,
             reduceMotion: false,
             motion: .subtle)
-        let subtleEnd = WhatsNewAnimatedGradientMotion.centers(
+        let subtleEnd = ReleaseAnimatedGradientMotion.centers(
             phase: 0.25,
             reduceMotion: false,
             motion: .subtle)
-        let expressiveStart = WhatsNewAnimatedGradientMotion.centers(
+        let expressiveStart = ReleaseAnimatedGradientMotion.centers(
             phase: 0,
             reduceMotion: false,
             motion: .expressive)
-        let expressiveEnd = WhatsNewAnimatedGradientMotion.centers(
+        let expressiveEnd = ReleaseAnimatedGradientMotion.centers(
             phase: 0.25,
             reduceMotion: false,
             motion: .expressive)
@@ -356,14 +356,14 @@ struct WhatsNewViewBuildTest {
 
     @Test
     func expressiveAnimatedGradientMotionHasHigherVisualContrastThanSubtleMotion() {
-        #expect(WhatsNewGradientMotion.expressive.baseTintScale > WhatsNewGradientMotion.subtle.baseTintScale)
-        #expect(WhatsNewGradientMotion.expressive.blobOpacityScale > WhatsNewGradientMotion.subtle.blobOpacityScale)
-        #expect(WhatsNewGradientMotion.expressive.blobBlurScale < WhatsNewGradientMotion.subtle.blobBlurScale)
+        #expect(ReleaseGradientMotion.expressive.baseTintScale > ReleaseGradientMotion.subtle.baseTintScale)
+        #expect(ReleaseGradientMotion.expressive.blobOpacityScale > ReleaseGradientMotion.subtle.blobOpacityScale)
+        #expect(ReleaseGradientMotion.expressive.blobBlurScale < ReleaseGradientMotion.subtle.blobBlurScale)
     }
 
     @Test
     func featureInitializerStoresStableID() {
-        let feature = WhatsNewFeature(
+        let feature = ReleaseFeature(
             id: "stable-feature",
             label: Text("Stable feature"),
             description: Text("A feature with stable identity."))
@@ -436,9 +436,9 @@ struct WhatsNewViewBuildTest {
         #expect(padding == 24)
     }
 
-    private func backgroundView(_ background: WhatsNewBackground) -> some View {
-        WhatsNewView(content: StyledContent(), onDismiss: {})
-            .whatsNewBackground(background)
+    private func backgroundView(_ background: ReleaseBackground) -> some View {
+        ReleaseView(content: StyledContent(), onDismiss: {})
+            .releaseBackground(background)
     }
 
     private func totalTravel(from first: [CGPoint], to second: [CGPoint]) -> Double {
@@ -450,18 +450,18 @@ struct WhatsNewViewBuildTest {
     }
 }
 
-private struct StyledContent: WhatsNewContent {
+private struct StyledContent: ReleaseContent {
     var title: Text { Text("Styled") }
-    var features: [WhatsNewFeature] {
+    var features: [ReleaseFeature] {
         [
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "styled-feature",
                 image: Image(systemName: "paintpalette.fill"),
                 label: Text("Styled feature"),
                 description: Text("This feature checks custom style construction.")),
         ]
     }
-    var notice: WhatsNewNotice? { WhatsNewNotice(text: Text("Styled notice")) }
+    var notice: ReleaseNotice? { ReleaseNotice(text: Text("Styled notice")) }
     var buttonText: Text { Text("Done") }
 }
 #endif

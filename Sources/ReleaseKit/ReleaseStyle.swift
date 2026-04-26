@@ -1,7 +1,7 @@
 #if os(iOS) || os(macOS)
 import SwiftUI
 
-public struct WhatsNewStyle {
+public struct ReleaseStyle {
     public var tint: Color?
     public var titleColor: Color?
     public var featureIconColor: Color?
@@ -33,7 +33,7 @@ public struct WhatsNewStyle {
     }
 }
 
-extension WhatsNewStyle {
+extension ReleaseStyle {
     var featureIconForegroundStyle: AnyShapeStyle {
         Self.foregroundStyle(for: self.featureIconColor ?? self.tint, fallback: AnyShapeStyle(.tint))
     }

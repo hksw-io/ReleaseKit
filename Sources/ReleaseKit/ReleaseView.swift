@@ -1,11 +1,11 @@
 #if os(iOS) || os(macOS)
 import SwiftUI
 
-public struct WhatsNewView<Content: WhatsNewContent>: View {
+public struct ReleaseView<Content: ReleaseContent>: View {
     let content: Content
     let onDismiss: () -> Void
-    private var background: WhatsNewBackground = .system
-    private var style: WhatsNewStyle = .standard
+    private var background: ReleaseBackground = .system
+    private var style: ReleaseStyle = .standard
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
@@ -31,7 +31,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
 
     public var body: some View {
         ZStack {
-            WhatsNewBackgroundView(
+            ReleaseBackgroundView(
                 background: self.background,
                 reduceMotion: self.reduceMotion,
                 brandColor: self.style.tint,
@@ -40,11 +40,11 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             GeometryReader { geometry in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: self.contentSpacing) {
-                        WhatsNewHeaderSection(
+                        ReleaseHeaderSection(
                             content: self.content,
                             iconSize: self.iconSize,
                             style: self.style)
-                        WhatsNewFeatureList(
+                        ReleaseFeatureList(
                             features: self.content.features,
                             featureSpacing: self.featureSpacing,
                             featureIconSize: self.featureIconSize,
@@ -83,7 +83,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
                 }
                 .overlay(alignment: .bottom) {
                     ZStack {
-                        WhatsNewFooterSection(
+                        ReleaseFooterSection(
                             content: self.content,
                             buttonPadding: self.buttonPadding,
                             style: self.style,
@@ -108,7 +108,7 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
         .clipped()
         .scrollIndicators(.never, axes: .vertical)
         .interactiveDismissDisabled()
-        .whatsNewTint(self.style.tint)
+        .releaseTint(self.style.tint)
         #if os(macOS)
             .frame(minWidth: Tokens.Layout.compactSheetMinWidth, minHeight: 560)
         #endif
@@ -117,13 +117,13 @@ public struct WhatsNewView<Content: WhatsNewContent>: View {
             }
     }
 
-    public func whatsNewBackground(_ background: WhatsNewBackground) -> Self {
+    public func releaseBackground(_ background: ReleaseBackground) -> Self {
         var view = self
         view.background = background
         return view
     }
 
-    public func whatsNewStyle(_ style: WhatsNewStyle) -> Self {
+    public func releaseStyle(_ style: ReleaseStyle) -> Self {
         var view = self
         view.style = style
         return view
@@ -180,7 +180,7 @@ enum ScrollEdgeFade {
 }
 
 enum FooterMaskMetrics {
-    static let coordinateSpaceName = "WhatsNewFooterMask"
+    static let coordinateSpaceName = "ReleaseFooterMask"
     static let heightStep: CGFloat = 1
     static let maximumFadeHeight: CGFloat = 28
 
@@ -301,15 +301,15 @@ private struct FooterContentMask: View {
     }
 }
 
-private struct WhatsNewBackgroundView: View {
-    let background: WhatsNewBackground
+private struct ReleaseBackgroundView: View {
+    let background: ReleaseBackground
     let reduceMotion: Bool
     let brandColor: Color?
     let colorScheme: ColorScheme
 
     var body: some View {
         self.background
-            .makeView(context: WhatsNewBackgroundContext(
+            .makeView(context: ReleaseBackgroundContext(
                 reduceMotion: self.reduceMotion,
                 brandColor: self.brandColor,
                 colorScheme: self.colorScheme))
@@ -317,10 +317,10 @@ private struct WhatsNewBackgroundView: View {
     }
 }
 
-private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
+private struct ReleaseHeaderSection<Content: ReleaseContent>: View {
     let content: Content
     let iconSize: CGFloat
-    let style: WhatsNewStyle
+    let style: ReleaseStyle
 
     var body: some View {
         VStack(spacing: Tokens.Spacing.large) {
@@ -342,7 +342,7 @@ private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
                 .font(.largeTitle)
             #endif
                 .fontWeight(.bold)
-                .whatsNewOptionalForegroundStyle(self.style.titleColor)
+                .releaseOptionalForegroundStyle(self.style.titleColor)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
@@ -350,18 +350,18 @@ private struct WhatsNewHeaderSection<Content: WhatsNewContent>: View {
     }
 }
 
-private struct WhatsNewFeatureList: View {
-    let features: [WhatsNewFeature]
+private struct ReleaseFeatureList: View {
+    let features: [ReleaseFeature]
     let featureSpacing: CGFloat
     let featureIconSize: CGFloat
     let featuresVisible: Bool
     let reduceMotion: Bool
-    let style: WhatsNewStyle
+    let style: ReleaseStyle
 
     var body: some View {
         VStack(spacing: self.featureSpacing) {
             ForEach(Array(self.features.enumerated()), id: \.element.id) { index, feature in
-                WhatsNewFeatureRow(
+                ReleaseFeatureRow(
                     feature: feature,
                     index: index,
                     featureIconSize: self.featureIconSize,
@@ -373,13 +373,13 @@ private struct WhatsNewFeatureList: View {
     }
 }
 
-private struct WhatsNewFeatureRow: View {
-    let feature: WhatsNewFeature
+private struct ReleaseFeatureRow: View {
+    let feature: ReleaseFeature
     let index: Int
     let featureIconSize: CGFloat
     let featuresVisible: Bool
     let reduceMotion: Bool
-    let style: WhatsNewStyle
+    let style: ReleaseStyle
 
     var body: some View {
         let delay = Tokens.Motion.revealDelay(for: self.index)
@@ -400,7 +400,7 @@ private struct WhatsNewFeatureRow: View {
                 if let label = self.feature.label {
                     label
                         .font(.headline)
-                        .whatsNewOptionalForegroundStyle(self.style.featureTitleColor)
+                        .releaseOptionalForegroundStyle(self.style.featureTitleColor)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 self.feature.description
@@ -423,10 +423,10 @@ private struct WhatsNewFeatureRow: View {
     }
 }
 
-private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
+private struct ReleaseFooterSection<Content: ReleaseContent>: View {
     let content: Content
     let buttonPadding: CGFloat
-    let style: WhatsNewStyle
+    let style: ReleaseStyle
     let onDismiss: () -> Void
 
     var body: some View {
@@ -465,7 +465,7 @@ private struct WhatsNewFooterSection<Content: WhatsNewContent>: View {
 
 private extension View {
     @ViewBuilder
-    func whatsNewTint(_ color: Color?) -> some View {
+    func releaseTint(_ color: Color?) -> some View {
         if let color {
             self.tint(color)
         } else {
@@ -474,7 +474,7 @@ private extension View {
     }
 
     @ViewBuilder
-    func whatsNewOptionalForegroundStyle(_ color: Color?) -> some View {
+    func releaseOptionalForegroundStyle(_ color: Color?) -> some View {
         if let color {
             self.foregroundStyle(color)
         } else {
@@ -483,50 +483,50 @@ private extension View {
     }
 }
 
-private struct WhatsNewPreviewContent: WhatsNewContent {
+private struct ReleasePreviewContent: ReleaseContent {
     var appIcon: Image? { Image(systemName: "app.gift.fill") }
     var title: Text { Text("What's New") }
-    var features: [WhatsNewFeature] {
+    var features: [ReleaseFeature] {
         [
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "first-feature",
                 systemImage: "sparkles",
                 label: "First feature",
                 description: "A short description of the first feature."),
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "second-feature",
                 systemImage: "bolt",
                 label: "Second feature",
                 description: "A short description of the second feature."),
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "third-feature",
                 systemImage: "arrow.triangle.2.circlepath",
                 label: "Third feature",
                 description: "A short description of the third feature."),
         ]
     }
-    var notice: WhatsNewNotice? {
-        WhatsNewNotice(text: Text("Plus many other improvements."))
+    var notice: ReleaseNotice? {
+        ReleaseNotice(text: Text("Plus many other improvements."))
     }
     var buttonText: Text { Text("Continue") }
 }
 
-private struct LongWhatsNewPreviewContent: WhatsNewContent {
+private struct LongReleasePreviewContent: ReleaseContent {
     var appIcon: Image? { Image(systemName: "square.stack.3d.up.fill") }
     var title: Text {
         Text("A much longer What's New title that needs to wrap cleanly")
     }
-    var features: [WhatsNewFeature] {
+    var features: [ReleaseFeature] {
         (1...10).map { index in
-            WhatsNewFeature(
+            ReleaseFeature(
                 id: "long-feature-\(index)",
                 systemImage: "checkmark.seal.fill",
                 label: "Feature \(index) with a longer localized label",
                 description: "This feature description is intentionally longer so the row wraps cleanly without clipping, overlapping, or hiding the footer action.")
         }
     }
-    var notice: WhatsNewNotice? {
-        WhatsNewNotice(text: Text("This notice is long enough to exercise multiline footer copy in a narrow sheet."))
+    var notice: ReleaseNotice? {
+        ReleaseNotice(text: Text("This notice is long enough to exercise multiline footer copy in a narrow sheet."))
     }
     var buttonText: Text {
         Text("Continue with all of these new improvements")
@@ -534,16 +534,16 @@ private struct LongWhatsNewPreviewContent: WhatsNewContent {
 }
 
 #Preview("What's New") {
-    WhatsNewView(content: WhatsNewPreviewContent(), onDismiss: {})
+    ReleaseView(content: ReleasePreviewContent(), onDismiss: {})
 }
 
 #Preview("What's New Long Narrow") {
-    WhatsNewView(content: LongWhatsNewPreviewContent(), onDismiss: {})
+    ReleaseView(content: LongReleasePreviewContent(), onDismiss: {})
         .frame(width: 320, height: 720)
 }
 
 #Preview("What's New Dark Accessibility") {
-    WhatsNewView(content: LongWhatsNewPreviewContent(), onDismiss: {})
+    ReleaseView(content: LongReleasePreviewContent(), onDismiss: {})
         .frame(width: 390, height: 760)
         .preferredColorScheme(.dark)
         .dynamicTypeSize(.accessibility2)

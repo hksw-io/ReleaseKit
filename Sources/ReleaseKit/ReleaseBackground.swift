@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-public struct WhatsNewBackgroundContext {
+public struct ReleaseBackgroundContext {
     public let reduceMotion: Bool
     public let brandColor: Color?
     public let colorScheme: ColorScheme
@@ -18,7 +18,7 @@ public struct WhatsNewBackgroundContext {
     }
 }
 
-public struct WhatsNewGradientPalette {
+public struct ReleaseGradientPalette {
     public struct Tones {
         public var base: Color
         public var primary: Color
@@ -64,7 +64,7 @@ public struct WhatsNewGradientPalette {
     }
 }
 
-public struct WhatsNewGradientMotion: Equatable, Sendable {
+public struct ReleaseGradientMotion: Equatable, Sendable {
     public var strength: Double
 
     public static let subtle = Self(strength: 0.7)
@@ -100,13 +100,13 @@ public struct WhatsNewGradientMotion: Equatable, Sendable {
     }
 }
 
-public struct WhatsNewBackground {
+public struct ReleaseBackground {
     enum Storage {
         case system
-        case softGradient(brand: Color?, palette: WhatsNewGradientPalette?)
+        case softGradient(brand: Color?, palette: ReleaseGradientPalette?)
         case linearGradient(colors: [Color], startPoint: UnitPoint, endPoint: UnitPoint)
-        case animatedGradient(brand: Color?, palette: WhatsNewGradientPalette?, motion: WhatsNewGradientMotion)
-        case custom((WhatsNewBackgroundContext) -> AnyView)
+        case animatedGradient(brand: Color?, palette: ReleaseGradientPalette?, motion: ReleaseGradientMotion)
+        case custom((ReleaseBackgroundContext) -> AnyView)
     }
 
     let storage: Storage
@@ -116,7 +116,7 @@ public struct WhatsNewBackground {
 
     public static func softGradient(
         brand: Color? = nil,
-        palette: WhatsNewGradientPalette? = nil) -> Self
+        palette: ReleaseGradientPalette? = nil) -> Self
     {
         Self(storage: .softGradient(brand: brand, palette: palette))
     }
@@ -131,8 +131,8 @@ public struct WhatsNewBackground {
 
     public static func animatedGradient(
         brand: Color? = nil,
-        palette: WhatsNewGradientPalette? = nil,
-        motion: WhatsNewGradientMotion = .standard) -> Self
+        palette: ReleaseGradientPalette? = nil,
+        motion: ReleaseGradientMotion = .standard) -> Self
     {
         Self(storage: .animatedGradient(brand: brand, palette: palette, motion: motion))
     }
@@ -144,7 +144,7 @@ public struct WhatsNewBackground {
         accent: Color = .mint) -> Self
     {
         self.animatedGradient(
-            palette: WhatsNewGradientPalette(
+            palette: ReleaseGradientPalette(
                 light: .init(
                     base: Tokens.background,
                     primary: primary,
@@ -154,7 +154,7 @@ public struct WhatsNewBackground {
     }
 
     public static func custom<Background: View>(
-        @ViewBuilder _ background: @escaping (WhatsNewBackgroundContext) -> Background) -> Self
+        @ViewBuilder _ background: @escaping (ReleaseBackgroundContext) -> Background) -> Self
     {
         Self(storage: .custom { context in
             AnyView(background(context))
@@ -162,27 +162,27 @@ public struct WhatsNewBackground {
     }
 }
 
-extension WhatsNewBackground {
+extension ReleaseBackground {
     @MainActor
-    func makeView(context: WhatsNewBackgroundContext) -> AnyView {
+    func makeView(context: ReleaseBackgroundContext) -> AnyView {
         switch self.storage {
         case .system:
             AnyView(Tokens.background)
         case let .softGradient(brand, palette):
-            AnyView(WhatsNewSoftGradientBackground(
-                tones: WhatsNewGradientPaletteResolver.tones(
+            AnyView(ReleaseSoftGradientBackground(
+                tones: ReleaseGradientPaletteResolver.tones(
                     brand: brand,
                     palette: palette,
                     context: context),
                 colorScheme: context.colorScheme))
         case let .linearGradient(colors, startPoint, endPoint):
-            AnyView(WhatsNewLinearGradientBackground(
+            AnyView(ReleaseLinearGradientBackground(
                 colors: colors,
                 startPoint: startPoint,
                 endPoint: endPoint))
         case let .animatedGradient(brand, palette, motion):
-            AnyView(WhatsNewAnimatedGradientBackground(
-                tones: WhatsNewGradientPaletteResolver.tones(
+            AnyView(ReleaseAnimatedGradientBackground(
+                tones: ReleaseGradientPaletteResolver.tones(
                     brand: brand,
                     palette: palette,
                     context: context),
@@ -195,12 +195,12 @@ extension WhatsNewBackground {
     }
 }
 
-private struct WhatsNewSoftGradientBackground: View {
-    let tones: WhatsNewGradientPalette.Tones
+private struct ReleaseSoftGradientBackground: View {
+    let tones: ReleaseGradientPalette.Tones
     let colorScheme: ColorScheme
 
     var body: some View {
-        let tuning = WhatsNewGradientVisualTuning.soft(colorScheme: self.colorScheme)
+        let tuning = ReleaseGradientVisualTuning.soft(colorScheme: self.colorScheme)
 
         ZStack {
             self.tones.base
@@ -235,23 +235,23 @@ private struct WhatsNewSoftGradientBackground: View {
     }
 }
 
-private struct WhatsNewLinearGradientBackground: View {
+private struct ReleaseLinearGradientBackground: View {
     let colors: [Color]
     let startPoint: UnitPoint
     let endPoint: UnitPoint
 
     var body: some View {
         LinearGradient(
-            colors: WhatsNewGradientColorNormalizer.colors(self.colors),
+            colors: ReleaseGradientColorNormalizer.colors(self.colors),
             startPoint: self.startPoint,
             endPoint: self.endPoint)
     }
 }
 
-private struct WhatsNewAnimatedGradientBackground: View {
-    let tones: WhatsNewGradientPalette.Tones
+private struct ReleaseAnimatedGradientBackground: View {
+    let tones: ReleaseGradientPalette.Tones
     let colorScheme: ColorScheme
-    let motion: WhatsNewGradientMotion
+    let motion: ReleaseGradientMotion
     let reduceMotion: Bool
 
     private static let baseCycleDuration: TimeInterval = 10
@@ -265,11 +265,11 @@ private struct WhatsNewAnimatedGradientBackground: View {
                 : timeline.date.timeIntervalSinceReferenceDate / (Self.baseCycleDuration / self.motion.speedScale)
 
             GeometryReader { geometry in
-                let centers = WhatsNewAnimatedGradientMotion.centers(
+                let centers = ReleaseAnimatedGradientMotion.centers(
                     phase: phase,
                     reduceMotion: self.reduceMotion,
                     motion: self.motion)
-                let tuning = WhatsNewGradientVisualTuning
+                let tuning = ReleaseGradientVisualTuning
                     .animated(colorScheme: self.colorScheme)
                     .scaled(for: self.motion)
 
@@ -278,7 +278,7 @@ private struct WhatsNewAnimatedGradientBackground: View {
                     colorMode: .extendedLinear,
                     rendersAsynchronously: true)
                 { context, size in
-                    WhatsNewAnimatedGradientRenderer.draw(
+                    ReleaseAnimatedGradientRenderer.draw(
                         context: &context,
                         size: size,
                         tones: self.tones,
@@ -291,12 +291,12 @@ private struct WhatsNewAnimatedGradientBackground: View {
     }
 }
 
-private enum WhatsNewAnimatedGradientRenderer {
+private enum ReleaseAnimatedGradientRenderer {
     static func draw(
         context: inout GraphicsContext,
         size: CGSize,
-        tones: WhatsNewGradientPalette.Tones,
-        tuning: WhatsNewAnimatedGradientTuning,
+        tones: ReleaseGradientPalette.Tones,
+        tuning: ReleaseAnimatedGradientTuning,
         centers: [CGPoint])
     {
         let rect = CGRect(origin: .zero, size: size)
@@ -390,18 +390,18 @@ private enum WhatsNewAnimatedGradientRenderer {
     }
 }
 
-private enum WhatsNewGradientPaletteResolver {
+private enum ReleaseGradientPaletteResolver {
     static func tones(
         brand: Color?,
-        palette: WhatsNewGradientPalette?,
-        context: WhatsNewBackgroundContext) -> WhatsNewGradientPalette.Tones
+        palette: ReleaseGradientPalette?,
+        context: ReleaseBackgroundContext) -> ReleaseGradientPalette.Tones
     {
         let resolvedPalette = palette ?? .brand(brand ?? context.brandColor ?? .blue)
         return resolvedPalette.tones(for: context.colorScheme)
     }
 }
 
-private struct WhatsNewSoftGradientTuning {
+private struct ReleaseSoftGradientTuning {
     let baseTintOpacity: Double
     let primaryOpacity: Double
     let secondaryOpacity: Double
@@ -411,7 +411,7 @@ private struct WhatsNewSoftGradientTuning {
     let bottomVeilOpacity: Double
 }
 
-private struct WhatsNewAnimatedGradientTuning {
+private struct ReleaseAnimatedGradientTuning {
     let baseTintOpacity: Double
     let primaryBlobOpacity: Double
     let secondaryBlobOpacity: Double
@@ -421,7 +421,7 @@ private struct WhatsNewAnimatedGradientTuning {
     let bottomVeilOpacity: Double
     let blobBlurRatio: CGFloat
 
-    func scaled(for motion: WhatsNewGradientMotion) -> Self {
+    func scaled(for motion: ReleaseGradientMotion) -> Self {
         Self(
             baseTintOpacity: min(0.72, self.baseTintOpacity * motion.baseTintScale),
             primaryBlobOpacity: min(0.78, self.primaryBlobOpacity * motion.blobOpacityScale),
@@ -434,10 +434,10 @@ private struct WhatsNewAnimatedGradientTuning {
     }
 }
 
-private enum WhatsNewGradientVisualTuning {
-    static func soft(colorScheme: ColorScheme) -> WhatsNewSoftGradientTuning {
+private enum ReleaseGradientVisualTuning {
+    static func soft(colorScheme: ColorScheme) -> ReleaseSoftGradientTuning {
         if colorScheme == .dark {
-            return WhatsNewSoftGradientTuning(
+            return ReleaseSoftGradientTuning(
                 baseTintOpacity: 0.20,
                 primaryOpacity: 0.24,
                 secondaryOpacity: 0.18,
@@ -447,7 +447,7 @@ private enum WhatsNewGradientVisualTuning {
                 bottomVeilOpacity: 0.42)
         }
 
-        return WhatsNewSoftGradientTuning(
+        return ReleaseSoftGradientTuning(
             baseTintOpacity: 0.12,
             primaryOpacity: 0.18,
             secondaryOpacity: 0.12,
@@ -457,9 +457,9 @@ private enum WhatsNewGradientVisualTuning {
             bottomVeilOpacity: 0.78)
     }
 
-    static func animated(colorScheme: ColorScheme) -> WhatsNewAnimatedGradientTuning {
+    static func animated(colorScheme: ColorScheme) -> ReleaseAnimatedGradientTuning {
         if colorScheme == .dark {
-            return WhatsNewAnimatedGradientTuning(
+            return ReleaseAnimatedGradientTuning(
                 baseTintOpacity: 0.26,
                 primaryBlobOpacity: 0.46,
                 secondaryBlobOpacity: 0.40,
@@ -470,7 +470,7 @@ private enum WhatsNewGradientVisualTuning {
                 blobBlurRatio: 0.028)
         }
 
-        return WhatsNewAnimatedGradientTuning(
+        return ReleaseAnimatedGradientTuning(
             baseTintOpacity: 0.38,
             primaryBlobOpacity: 0.46,
             secondaryBlobOpacity: 0.42,
@@ -482,11 +482,11 @@ private enum WhatsNewGradientVisualTuning {
     }
 }
 
-enum WhatsNewAnimatedGradientMotion {
+enum ReleaseAnimatedGradientMotion {
     static func centers(
         phase: Double,
         reduceMotion: Bool,
-        motion: WhatsNewGradientMotion = .standard) -> [CGPoint]
+        motion: ReleaseGradientMotion = .standard) -> [CGPoint]
     {
         let phase = reduceMotion ? 0 : phase
         let travelScale = reduceMotion ? 0 : motion.travelScale
@@ -507,7 +507,7 @@ enum WhatsNewAnimatedGradientMotion {
     }
 }
 
-enum WhatsNewGradientColorNormalizer {
+enum ReleaseGradientColorNormalizer {
     static func colors(_ colors: [Color]) -> [Color] {
         switch colors.count {
         case 0:
