@@ -450,6 +450,7 @@ private struct ReleaseFooterSection<Content: ReleaseContent>: View {
                     .foregroundStyle(self.style.buttonForegroundStyle)
                     .frame(maxWidth: .infinity, minHeight: Tokens.Layout.buttonLabelMinHeight)
                     .padding(.vertical, self.buttonPadding)
+                    .contentShape(RoundedRectangle(cornerRadius: Tokens.Radius.button, style: .continuous))
             }
             .buttonStyle(.plain)
             .controlSize(.extraLarge)
@@ -458,7 +459,6 @@ private struct ReleaseFooterSection<Content: ReleaseContent>: View {
                     .fill(self.style.buttonBackgroundStyle)
             }
             .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.button, style: .continuous))
-            .contentShape(RoundedRectangle(cornerRadius: Tokens.Radius.button, style: .continuous))
         }
         .padding(.top, Tokens.Layout.footerTopPadding)
         .padding(.bottom, Tokens.Layout.footerBottomPadding)
