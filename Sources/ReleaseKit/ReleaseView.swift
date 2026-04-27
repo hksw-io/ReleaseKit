@@ -430,14 +430,7 @@ private struct ReleaseFooterSection<Content: ReleaseContent>: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        VStack(spacing: Tokens.Spacing.medium) {
-            if let notice = self.content.notice {
-                notice.text
-                    .font(.caption)
-                    .foregroundStyle(self.style.noticeForegroundStyle)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+        VStack(spacing: Tokens.Layout.footerControlSpacing) {
             Button {
                 self.onDismiss()
             } label: {
@@ -457,6 +450,18 @@ private struct ReleaseFooterSection<Content: ReleaseContent>: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.button, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: Tokens.Radius.button, style: .continuous))
+
+            if let notice = self.content.notice {
+                notice.text
+                    .font(.subheadline)
+                    .foregroundStyle(self.style.noticeForegroundStyle)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(
+                        maxWidth: .infinity,
+                        minHeight: Tokens.Layout.minimumControlHeight,
+                        alignment: .top)
+            }
         }
         .padding(.top, Tokens.Layout.footerTopPadding)
         .padding(.bottom, Tokens.Layout.footerBottomPadding)
