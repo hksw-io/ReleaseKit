@@ -22,7 +22,7 @@ enum Tokens {
         static let compactSheetMinWidth: CGFloat = 320
         static let footerControlSpacing: CGFloat = Spacing.medium
         static let footerTopPadding: CGFloat = 20
-        static let footerBottomPadding: CGFloat = 0
+        static let footerBottomPadding: CGFloat = minimumControlHeight + footerControlSpacing
         static let minimumControlHeight: CGFloat = 44
         static let buttonLabelMinHeight: CGFloat = 28
     }

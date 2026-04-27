@@ -304,9 +304,9 @@ struct ReleaseViewBuildTest {
     }
 
     @Test
-    func footerUsesAsymmetricPaddingToSitCloserToBottomEdge() {
-        #expect(Tokens.Layout.footerBottomPadding == 0)
-        #expect(Tokens.Layout.footerBottomPadding < Tokens.Layout.footerTopPadding)
+    func footerBottomPaddingMirrorsSkipControlFootprintForButtonClearance() {
+        #expect(Tokens.Layout.footerBottomPadding == Tokens.Layout.minimumControlHeight + Tokens.Layout.footerControlSpacing)
+        #expect(Tokens.Layout.footerBottomPadding > Tokens.Layout.footerTopPadding)
     }
 
     @Test
